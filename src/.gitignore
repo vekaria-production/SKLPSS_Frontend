@@ -1,0 +1,5 @@
+# Ignore .cash files
+*.cache 
+
+# Ignore .module files
+*.node_modules
