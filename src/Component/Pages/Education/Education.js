@@ -3,8 +3,12 @@ import { GraduationCap, BookText, FileText } from "lucide-react";
 import Navbar from "../../UI/Navbar/Navbar";
 import Footer from "../../UI/Footer/Footer";
 import img from "../../../assets/Edu_Hero.png";
+import { useNavigate } from "react-router-dom";
+
+
 
 const Education = () => {
+  const navigate=useNavigate();
   return (
     <>
       <Navbar />
@@ -22,8 +26,8 @@ const Education = () => {
               Indian community in Seychelles.
             </p>
             <button
-              className="bg-[#F48F0F] hover:bg-[#e1810c] text-[#292929] font-semibold px-6 py-2 rounded-lg transition"
-              onClick={() => alert("🚧 This feature is under development!")}
+              className="bg-[#F48F0F] hover:bg-[#e1810c] text-[#292929] font-semibold px-6 py-2 rounded-lg transition duration-500"
+              onClick={() => navigate("/Education/Login")}
             >
               Login as Student/Teacher
             </button>

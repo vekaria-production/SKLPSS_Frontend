@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   Settings as SettingsIcon,
+  BookOpen,
 } from "lucide-react";
 import Topbar from "./Topbar";
 
@@ -94,6 +95,14 @@ const SidebarLayout = ({ children }) => {
               icon={<Users />}
               label="Members"
               to="/Admin/Members"
+              collapsed={isCollapsed && !isMobile}
+              isMobile={isMobile}
+              setIsCollapsed={setIsCollapsed}
+            />
+            <SidebarLink
+              icon={<BookOpen />}
+              label="Education"
+              to="/Admin/Education"
               collapsed={isCollapsed && !isMobile}
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
