@@ -10,12 +10,16 @@ import {
   Settings as SettingsIcon,
 } from "lucide-react";
 import Topbar from "./Topbar";
-
+import { useAuth } from "../../../Context/Auth/AuthContext";
 const currentUser = { id: 1, name: "Yagnik", role: "admin" }; // Replace with auth context later
 
 const SidebarLayout = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
+
+  const { permissions } = useAuth();
+  const hasPermission = (field) => permissions.includes(`${field}`);
+  
 
   useEffect(() => {
     const handleResize = () => {
@@ -74,14 +78,17 @@ const SidebarLayout = ({ children }) => {
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
             />
-            <SidebarLink
-              icon={<Calendar />}
-              label="Events"
-              to="/Admin/events"
-              collapsed={isCollapsed && !isMobile}
-              isMobile={isMobile}
-              setIsCollapsed={setIsCollapsed}
-            />
+            {hasPermission("view_events") && (
+              <SidebarLink
+                icon={<Calendar />}
+                label="Events"
+                to="/Admin/events"
+                collapsed={isCollapsed && !isMobile}
+                isMobile={isMobile}
+                setIsCollapsed={setIsCollapsed}
+              />
+            )}
+            {hasPermission("view_gallery") && (
             <SidebarLink
               icon={<Image />}
               label="Gallery"
@@ -90,6 +97,8 @@ const SidebarLayout = ({ children }) => {
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
             />
+            )}
+
             <SidebarLink
               icon={<Users />}
               label="Members"
