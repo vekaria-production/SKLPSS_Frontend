@@ -2,13 +2,16 @@
 // import './App.css';
 import RouteMmgmt from './Context/Route/Route'
 import { OptionsProvider } from './Context/Options/OptionsContext'; // ✅ fixed import
+import { AuthProvider } from './Context/Auth/AuthContext';
 
 function App() {
   return (
     <>
-      <OptionsProvider>
-        <RouteMmgmt/>
-      </OptionsProvider>
+      <AuthProvider>
+        <OptionsProvider>
+          <RouteMmgmt/>
+        </OptionsProvider>
+      </AuthProvider>
     </>
     
   );
