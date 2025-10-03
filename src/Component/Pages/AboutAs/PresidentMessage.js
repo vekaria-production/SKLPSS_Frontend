@@ -9,8 +9,7 @@ export default function PresidentMessage() {
         <div className="md:col-span-2">
           <h3 className="text-xl font-bold">President message</h3>
           <p className="text-gray-700 mt-2 text-sm">
-            It brings me great pride and heartfelt joy to address you as the President of our vibrant Indian community
-            in Seychelles. Our organization has always stood as a beacon of unity, tradition, and shared purpose—
+            It brings me great pride and heartfelt joy to address you as the President of our vibrant Shree Kutchi Leva Patel Samaj Seychelles. Our organization has always stood as a beacon of unity, tradition, and shared purpose—
             bridging generations and preserving the essence of our cultural identity. <br />
             As we move forward, our focus remains clear: to empower our youth through education, support our elders
             with respect, and foster togetherness through meaningful activities. This website marks a new chapter—a
