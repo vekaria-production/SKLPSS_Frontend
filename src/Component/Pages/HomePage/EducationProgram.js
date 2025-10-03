@@ -9,9 +9,9 @@ import gamesImg from "./../../../assets/cook-off.png";
 export default function EducationProgramsHighlight() {
   const galleryImages = [
     { src: performanceImg, alt: "Performance at festival" },
-    { src: picnicImg, alt: "Class picnic activity" },
-    { src: danceImg, alt: "Dance performance" },
-    { src: gamesImg, alt: "Games for students" },
+    // { src: picnicImg, alt: "Class picnic activity" },
+    // { src: danceImg, alt: "Dance performance" },
+    // { src: gamesImg, alt: "Games for students" },
   ];
 
   const sectionRef = useRef(null);
@@ -168,9 +168,7 @@ export default function EducationProgramsHighlight() {
                   alt={img.alt}
                   className="max-w-full max-h-full object-contain"
                 />
-                <div className="absolute top-4 left-4 bg-[#F48F0F]/90 text-white px-3 py-1 rounded-full text-xs font-bold">
-                  Image {index + 1}/{galleryImages.length}
-                </div>
+
               </div>
             ))}
           </div>
@@ -203,7 +201,7 @@ export default function EducationProgramsHighlight() {
       </div>
 
       {/* Placeholder */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border-2 border-dashed border-[#F48F0F]/30 text-center hover:border-[#F48F0F] transition-colors mt-8">
+      {/* <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border-2 border-dashed border-[#F48F0F]/30 text-center hover:border-[#F48F0F] transition-colors mt-8">
         <h3 className="font-semibold text-[clamp(1.125rem,2.2vw,1.5rem)] text-[#292929] mb-4">
           Placeholder for Future Content
         </h3>
@@ -215,7 +213,7 @@ export default function EducationProgramsHighlight() {
         <button className="mt-4 bg-[#F48F0F]/80 text-white px-6 py-2 rounded-full font-semibold hover:bg-[#F48F0F] transition-colors">
           Expand Section
         </button>
-      </div>
+      </div> */}
     </section>
   );
 }

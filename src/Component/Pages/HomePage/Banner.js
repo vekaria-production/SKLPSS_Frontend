@@ -15,7 +15,7 @@ export default function Banner() {
         {/* Text Overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center bg-black bg-opacity-25 animate-fade-in px-4">
           <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold mb-3 drop-shadow-md">
-            Welcome to Our Community
+            Welcome to Shree Kutchi Leva Patel Samaj Seychelles
           </h1>
           <p className="text-white text-base sm:text-lg md:text-xl mb-4 drop-shadow-sm max-w-2xl">
             Connect, collaborate, and grow together. We're building a space where everyone belongs.
