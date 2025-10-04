@@ -74,7 +74,7 @@ const Settings = () => {
     console.log(itemToDelete);
     if (itemToDelete.roles) {
           try {
-                await axios.delete(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/users/${itemToDelete.id}`, {
+                await axios.delete(`${process.env.REACT_APP_NETWORK}/users/${itemToDelete.id}`, {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
@@ -86,7 +86,7 @@ const Settings = () => {
           }    
     } else {
           try {
-                await axios.delete(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/roles/${itemToDelete.id}`, {
+                await axios.delete(`${process.env.REACT_APP_NETWORK}/roles/${itemToDelete.id}`, {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
@@ -108,12 +108,12 @@ const Settings = () => {
     try {
       if (selectedUser) {
         // 🔄 Update
-        await axios.put(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/users/${selectedUser.id}`, user, {
+        await axios.put(`${process.env.REACT_APP_NETWORK}/users/${selectedUser.id}`, user, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       } else {
         // ➕ Create
-        await axios.post(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/users`, user, {
+        await axios.post(`${process.env.REACT_APP_NETWORK}/users`, user, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
@@ -133,7 +133,7 @@ const Settings = () => {
       if (selectedRole) {
         // 🔄 Update existing role
         await axios.put(
-          `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/roles/${selectedRole.id}`,
+          `${process.env.REACT_APP_NETWORK}/roles/${selectedRole.id}`,
           role, // { name: "Editor", permissions: ["view_event", "add_gallery"] }
           {
             headers: {
@@ -144,7 +144,7 @@ const Settings = () => {
       } else {
         // ➕ Create new role
         await axios.post(
-          `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/roles`,
+          `${process.env.REACT_APP_NETWORK}/roles`,
           role, // { name: "Editor", permissions: ["view_event", "add_gallery"] }
           {
             headers: {
@@ -169,7 +169,7 @@ const Settings = () => {
           try {
             // Fetch members
             const roles = await axios.get(
-              `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/roles`,
+              `${process.env.REACT_APP_NETWORK}/roles`,
               {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -198,7 +198,7 @@ const Settings = () => {
           try {
             // Fetch members
             const users = await axios.get(
-              `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/users`,
+              `${process.env.REACT_APP_NETWORK}/users`,
               {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`

@@ -10,7 +10,7 @@ import axios from "axios";
 
 async function getEventsData({  offset = 0, limit = 100 } = {}) {
   try {
-    const response = await axios.get(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getEventList`, {
+    const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
       params: {  offset, limit },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -127,7 +127,7 @@ const ManageEvents = () => {
   async function handleDeleteConfirmed () {
 
     try {
-        await axios.delete(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/deleteEvent/${deleteId}`, {
+        await axios.delete(`${process.env.REACT_APP_NETWORK}/deleteEvent/${deleteId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

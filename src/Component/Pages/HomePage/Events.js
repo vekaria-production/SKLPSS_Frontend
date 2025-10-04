@@ -29,7 +29,7 @@ export default function Events() {
       async function getEvents({offset=0, limit=100} ={}){
   
         try {
-          const response = await axios.get(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getEventList`, {
+          const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
             params: {  offset, limit, from_date: currentDate },
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,

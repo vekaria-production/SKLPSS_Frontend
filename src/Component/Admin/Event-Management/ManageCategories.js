@@ -28,7 +28,7 @@ const ManageCategories = () => {
 
   async function handleDelete(){
     try {
-        await axios.delete(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/Categorys/${deleteTarget.Id}`, {
+        await axios.delete(`${process.env.REACT_APP_NETWORK}/Categorys/${deleteTarget.Id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -64,7 +64,7 @@ const ManageCategories = () => {
 
     async function fetchCategories() {
       try {
-          const response = await axios.get(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/Categorys`, {
+          const response = await axios.get(`${process.env.REACT_APP_NETWORK}/Categorys`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }

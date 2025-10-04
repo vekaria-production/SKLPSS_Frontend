@@ -128,7 +128,7 @@ const EventsPage = () => {
     async function getEvents({offset=0, limit=100} ={}){
 
       try {
-          const response = await axios.get(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getEventList`, {
+          const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
             params: {  offset, limit },
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,

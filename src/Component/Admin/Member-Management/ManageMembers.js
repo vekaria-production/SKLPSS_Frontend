@@ -93,7 +93,7 @@ const ManageMembers = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/deleteMember/${id}`,
+        `${process.env.REACT_APP_NETWORK}/deleteMember/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -115,7 +115,7 @@ const ManageMembers = () => {
 
     async function fetchMembers() {
           try {
-          const response = await axios.get(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getMemberList`, {
+          const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getMemberList`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }

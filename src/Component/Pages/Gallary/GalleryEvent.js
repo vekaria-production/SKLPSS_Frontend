@@ -37,7 +37,7 @@
 
 //       try {
 //         const response = await axios.get(
-//           `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getEventImages/${Id}?offset=${currentOffset}&limit=${limit}`,
+//           `${process.env.REACT_APP_NETWORK}/getEventImages/${Id}?offset=${currentOffset}&limit=${limit}`,
 //           {
 //             headers: {
 //               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -165,7 +165,7 @@ const uploadImages = async (files, Id) => {
 
   try {
     const response = await axios.post(
-      `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/updateEventImage/${Id}`,
+      `${process.env.REACT_APP_NETWORK}/updateEventImage/${Id}`,
       formData,
       {
         headers: {
@@ -200,7 +200,7 @@ const GalleryEvent = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getEventImages/${Id}?offset=${currentOffset}&limit=${limit}`,
+        `${process.env.REACT_APP_NETWORK}/getEventImages/${Id}?offset=${currentOffset}&limit=${limit}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,

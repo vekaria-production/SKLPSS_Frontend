@@ -49,7 +49,7 @@ function Gallery() {
     async function getCategories() {
       // try {
         const response = await axios.get(
-          `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/CategoryList`,
+          `${process.env.REACT_APP_NETWORK}/CategoryList`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -80,7 +80,7 @@ function Gallery() {
     async function getEvents(){
 
       try {
-        const response = await axios.get(`http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/getEventList`, {
+        const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
         params:{
           offset: 0,
           limit: 100,

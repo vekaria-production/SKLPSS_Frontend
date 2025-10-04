@@ -42,7 +42,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
           const response =await axios.get(
-          `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/MEG`,
+          `${process.env.REACT_APP_NETWORK}/MEG`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

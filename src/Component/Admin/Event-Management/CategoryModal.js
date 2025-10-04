@@ -19,7 +19,7 @@ const CategoryModal = ({ category, onSave, onClose }) => {
       if (category?.Id) {
         // Update existing category
            await axios.put(
-          `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/updateCategory/${category.Id}`,
+          `${process.env.REACT_APP_NETWORK}/updateCategory/${category.Id}`,
           { category: name.trim() },
           {
             headers: {
@@ -30,7 +30,7 @@ const CategoryModal = ({ category, onSave, onClose }) => {
       } else {
         // Create new category
          await axios.post(
-          `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/setCategories`,
+          `${process.env.REACT_APP_NETWORK}/setCategories`,
           { category: name.trim() },
           {
             headers: {

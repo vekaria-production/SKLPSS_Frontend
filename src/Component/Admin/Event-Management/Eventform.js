@@ -121,8 +121,8 @@ const EventForm = () => {
     console.log(Id)
     try {
       const url = isNew
-        ? `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/event`
-        : `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/updateEvent/${Id}`;
+        ? `${process.env.REACT_APP_NETWORK}/event`
+        : `${process.env.REACT_APP_NETWORK}/updateEvent/${Id}`;
 
       const method = isNew ? "post" : "put";
 

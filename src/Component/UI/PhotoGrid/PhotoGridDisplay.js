@@ -37,7 +37,7 @@ const PhotoGridDisplay = ({
   async function deleteImage(imageId) {
     try {
       await axios.delete(
-        `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/deleteImage`, 
+        `${process.env.REACT_APP_NETWORK}/deleteImage`, 
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,

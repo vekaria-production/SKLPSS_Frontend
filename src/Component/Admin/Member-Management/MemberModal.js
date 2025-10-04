@@ -79,8 +79,8 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
 
     // Endpoint URL & method
     const url = isEdit
-      ? `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/updateMember/${formData.Id}`
-      : `http://${process.env.REACT_APP_NETWORK}:${process.env.REACT_APP_PORT}/addMember`;
+      ? `${process.env.REACT_APP_NETWORK}/updateMember/${formData.Id}`
+      : `${process.env.REACT_APP_NETWORK}/addMember`;
 
     try {
       const response = await axios({
