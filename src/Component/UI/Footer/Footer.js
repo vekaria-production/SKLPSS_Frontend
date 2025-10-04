@@ -18,8 +18,8 @@ function Footer() {
         <div className="min-w-[200px]">
           <h4 className="text-[1.1rem] font-semibold mb-3 tracking-wide">Get in Touch</h4>
           <p className="text-[#555] leading-relaxed">
-            📧 info@example.org<br />
-            📞 +1 234 567 8900
+            📧 support@sklpss.org<br />
+            📞 +248 2610899
           </p>
         </div>
 
