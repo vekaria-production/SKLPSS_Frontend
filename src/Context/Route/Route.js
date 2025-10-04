@@ -29,7 +29,7 @@ import AssignedCourses from "../../Component/Pages/Education/Teacher/Assigned_co
 import AssignmentForm from "../../Component/Pages/Education/Teacher/AssignmentForm";
 import VideoForm from "../../Component/Pages/Education/Teacher/VideoForm";
 import Submission from "../../Component/Pages/Education/Teacher/Submission";
-
+import PrivateRoute from "./PrivateRoute";
 function RouteMmgmt() {
   return (
     <BrowserRouter>
@@ -44,15 +44,15 @@ function RouteMmgmt() {
 
 
         <Route path="/AdminLogin" element={<Login />} />
-        <Route path="/Admin" element={<Dashboard />} />
-        <Route path="/Admin/events" element={<Event />} />
-        <Route path="/Admin/events/Manage_Categories" element={<ManageCategories />} />
-        <Route path="/Admin/Gallery" element={<Managegallery />} />
-        <Route path="/Admin/Members" element={<ManageMembers />} />
-        <Route path="/Admin/:Type/:Id" element={<EventForm />} />
-        <Route path="/Admin/Edit-Gallery/:Id" element={<ManagePhotos />} />
-        <Route path="/Admin/Education" element={<Edu_management />} />
-        <Route path="/Admin/Settings" element={<Settings />} />
+        <Route path="/Admin" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/Admin/events" element={<PrivateRoute ><Event /></PrivateRoute>} />
+        <Route path="/Admin/events/Manage_Categories" element={<PrivateRoute><ManageCategories /></PrivateRoute>} />
+        <Route path="/Admin/Gallery" element={<PrivateRoute><Managegallery /></PrivateRoute>} />
+        <Route path="/Admin/Members" element={<PrivateRoute><ManageMembers /></PrivateRoute>} />
+        <Route path="/Admin/:Type/:Id" element={<PrivateRoute><EventForm /></PrivateRoute>} />
+        <Route path="/Admin/Edit-Gallery/:Id" element={<PrivateRoute><ManagePhotos /></PrivateRoute>} />
+        <Route path="/Admin/Education" element={<PrivateRoute><Edu_management /></PrivateRoute>} />
+        <Route path="/Admin/Settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
         
         <Route path="/Education/Student" element={<StudentDashboard />} />
         <Route path="/Education/Student/Courses" element={<Courses />} />
