@@ -13,6 +13,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
     loading: optionsLoading,
     errors: optinoErrors
   } = useOptions();
+  // console.log("Positions from useOptions:", position);
   const [preview, setPreview] = useState(null);
   useEffect(() => {
     return () => {
@@ -225,7 +226,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
             >
               <option value="">Select Designation</option>
               {position.map((pos) => (
-                <option key={pos.id} value={pos.id}>{pos.name}</option>
+                <option key={pos[0]} value={pos[0]}>{pos[1]}</option>
               ))}
             </select>
             {errors.Position && <p className="text-red-500 text-sm">{errors.Position}</p>}

@@ -5,7 +5,7 @@ export default function PresidentMessage() {
   return (
     <section className="max-w-5xl mx-auto px-4 py-8">
       <div className="bg-white rounded-xl shadow-md p-6 grid md:grid-cols-3 gap-6 items-center">
-        {/* <img src={President} alt="President" className="rounded-lg w-full" /> */}
+        <img src={President} alt="President" className="rounded-lg w-full" />
         <div className="md:col-span-2">
           <h3 className="text-xl font-bold">President message</h3>
           <p className="text-gray-700 mt-2 text-sm">

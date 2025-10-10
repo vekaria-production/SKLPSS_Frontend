@@ -81,20 +81,20 @@ function Navbar() {
         </nav>
 
         {/* Button */}
-        <div className="hidden md:block md:ml-auto pr-4">
+        {/* <div className="hidden md:block md:ml-auto pr-4">
           <button onClick={() => navigate("/Membership")} className="bg-[#F48F0F] text-[#292929] px-5 py-2 rounded-full font-semibold text-[clamp(1rem,2vw,1.05rem)] uppercase tracking-wider shadow hover:brightness-110 transition-all duration-200">
             Become a member
           </button>
-        </div>
+        </div> */}
 
         {/* Mobile Button */}
-        {isMenuOpen && (
+        {/* {isMenuOpen && (
           <div className="w-full flex justify-center mt-4 md:hidden pb-4">
             <button onClick={() => navigate("/Membership")} className="bg-[#F48F0F] text-[#292929] px-5 py-2 rounded-full font-semibold text-[clamp(0.9rem,2vw,1rem)] uppercase tracking-wide shadow hover:brightness-110 transition-all duration-200">
               Become a member
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </header>
   );
