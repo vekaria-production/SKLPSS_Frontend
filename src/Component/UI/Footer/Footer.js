@@ -37,7 +37,7 @@ function Footer() {
         {/* Newsletter */}
         <div className="min-w-[250px]">
           <h4 className="text-[1.1rem] font-semibold mb-3 tracking-wide">Subscribe to our newsletter</h4>
-          <input
+          {/* <input
             type="email"
             placeholder="Enter your email"
             className="w-full p-2 border border-gray-300 rounded-md text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#F48F0F]"
@@ -51,7 +51,7 @@ function Footer() {
           <button className="bg-[#F48F0F] text-[#292929] py-2 px-5 rounded-full font-semibold hover:brightness-110 transition">
             Subscribe
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Socials & Scroll */}

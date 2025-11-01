@@ -27,7 +27,7 @@ const Education = () => {
             </p>
             <button
               className="bg-[#F48F0F] hover:bg-[#e1810c] text-[#292929] font-semibold px-6 py-2 rounded-lg transition duration-500"
-              onClick={() => navigate("/Education/Login")}
+              onClick={() => window.open("https://lms.sklpss.org", "_blank")}
             >
               Login as Student/Teacher
             </button>
