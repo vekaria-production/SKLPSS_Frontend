@@ -25,10 +25,13 @@ export default function CommitteeTreeWithModal() {
   // Fetch data
   useEffect(() => {
     async function fetchData() {
+
+      const formData = new FormData();
+      formData.append('excludePosition', 5);
       try {
         // Fetch members
         const membersResponse = await axios.get(
-          `${process.env.REACT_APP_NETWORK}/getMemberList`,
+          `${process.env.REACT_APP_NETWORK}/getMemberList`,formData,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`
