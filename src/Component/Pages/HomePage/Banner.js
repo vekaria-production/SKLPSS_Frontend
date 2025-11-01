@@ -20,9 +20,9 @@ export default function Banner() {
           <p className="text-white text-base sm:text-lg md:text-xl mb-4 drop-shadow-sm max-w-2xl">
             Connect, collaborate, and grow together. We're building a space where everyone belongs.
           </p>
-          <button className="bg-white text-black px-6 py-2 rounded-full text-sm sm:text-base font-semibold shadow hover:bg-gray-200 transition">
+          {/* <button className="bg-white text-black px-6 py-2 rounded-full text-sm sm:text-base font-semibold shadow hover:bg-gray-200 transition">
             Join Us Now
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
