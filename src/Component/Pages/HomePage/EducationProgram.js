@@ -124,8 +124,8 @@ export default function EducationProgramsHighlight() {
       </h2>
 
       {/* Gujarati Classes */}
-      <div className="flex flex-col lg:flex-row items-start bg-white rounded-2xl shadow-md border border-[#e4e4e4] hover:shadow-xl overflow-hidden w-full">
-        <div className="text-left w-full lg:w-1/2 p-6 lg:p-8 order-2 lg:order-1 z-10 bg-white">
+      <div className="flex flex-col lg:flex-row-reverse items-start bg-white rounded-2xl shadow-md border border-[#e4e4e4] hover:shadow-xl overflow-hidden mt-8">
+        <div className="text-left w-full lg:w-1/2 p-6 lg:p-8 order-2 lg:order-1">
           <h3 className="font-semibold text-[clamp(1.125rem,2.2vw,1.5rem)] text-[#292929] mb-4">
             Gujarati Classes for the Diaspora
           </h3>
