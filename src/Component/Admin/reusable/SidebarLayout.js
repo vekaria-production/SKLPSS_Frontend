@@ -9,6 +9,7 @@ import {
   X,
   Settings as SettingsIcon,
   BookOpen,
+  TicketCheck,
 } from "lucide-react";
 import Topbar from "./Topbar";
 import { useAuth } from "../../../Context/Auth/AuthContext";
@@ -108,10 +109,18 @@ const SidebarLayout = ({ children }) => {
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
             />
-            <SidebarLink
+            {/* <SidebarLink
               icon={<BookOpen />}
               label="Education"
               to="/Admin/Education"
+              collapsed={isCollapsed && !isMobile}
+              isMobile={isMobile}
+              setIsCollapsed={setIsCollapsed}
+            /> */}
+            <SidebarLink
+              icon={<TicketCheck />}
+              label="Tickets"
+              to="/Admin/Event-Registration"
               collapsed={isCollapsed && !isMobile}
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}

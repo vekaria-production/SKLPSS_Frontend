@@ -29,6 +29,7 @@ import AssignedCourses from "../../Component/Pages/Education/Teacher/Assigned_co
 import AssignmentForm from "../../Component/Pages/Education/Teacher/AssignmentForm";
 import VideoForm from "../../Component/Pages/Education/Teacher/VideoForm";
 import Submission from "../../Component/Pages/Education/Teacher/Submission";
+import QrScanner from "../../Component/Admin/Event_Registration/Eventregistration";
 import PrivateRoute from "./PrivateRoute";
 function RouteMmgmt() {
   return (
@@ -51,7 +52,8 @@ function RouteMmgmt() {
         <Route path="/Admin/Members" element={<PrivateRoute><ManageMembers /></PrivateRoute>} />
         <Route path="/Admin/:Type/:Id" element={<PrivateRoute><EventForm /></PrivateRoute>} />
         <Route path="/Admin/Edit-Gallery/:Id" element={<PrivateRoute><ManagePhotos /></PrivateRoute>} />
-        <Route path="/Admin/Education" element={<PrivateRoute><Edu_management /></PrivateRoute>} />
+        {/* <Route path="/Admin/Education" element={<PrivateRoute><Edu_management /></PrivateRoute>} /> */}
+        <Route path="/Admin/Event-Registration" element={<PrivateRoute><QrScanner /></PrivateRoute>} />
         <Route path="/Admin/Settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
         
         <Route path="/Education/Student" element={<StudentDashboard />} />
@@ -60,8 +62,8 @@ function RouteMmgmt() {
         <Route path="/Education/Student/Course/:id" element={<CourseView />} />
         <Route path="/Education/Student/Course/:courseid/Module/:chapterid/Assignment/:Assignmentid" element={<AssignmentUpload />} />
         <Route path="/Education/SignUp" element={<Signup />} />
-        <Route path="/Education/Login" element={<Edu_Login />} />
-        <Route path="/Education/Teacher" element={<Teacher_Dash />} />
+        {/* <Route path="/Education/Login" element={<Edu_Login />} /> */}
+        {/* <Route path="/Education/Teacher" element={<Teacher_Dash />} /> */}
         <Route path="/Education/Teacher/Courses" element={<AssignedCourses />} />
         <Route path="/Education/Teacher/Course/:id" element={<CourseView />} />
         <Route path="/Education/Teacher/Course/:courseid/Module/:chapterid/Assignment/:Assignmentid" element={<AssignmentForm />} />
