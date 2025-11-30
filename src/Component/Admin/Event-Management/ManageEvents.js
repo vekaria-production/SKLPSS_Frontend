@@ -6,12 +6,13 @@ import CustomTable from "../reusable/CustomTable";
 
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import axios from "axios";
+import { CircleCheckBig, Clock, TicketCheck, Users } from "lucide-react";
 
 
-async function getEventsData({  offset = 0, limit = 100 } = {}) {
+async function getEventsData({ offset = 0, limit = 100 } = {}) {
   try {
     const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
-      params: {  offset, limit },
+      params: { offset, limit },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -27,6 +28,28 @@ async function getEventsData({  offset = 0, limit = 100 } = {}) {
 
 
 const ManageEvents = () => {
+  // State for user modal and registered users
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [userModalLoading, setUserModalLoading] = useState(false);
+  const [userModalError, setUserModalError] = useState("");
+
+  // Fetch registered users for an event
+  async function showUser(eventId) {
+    setShowUserModal(true);
+    setUserModalLoading(true);
+    setUserModalError("");
+    // Backend call for showing users registered in event with eventId
+    setUserModalLoading(false);
+  }
+
+  function closeUserModal() {
+    setShowUserModal(false);
+    setRegisteredUsers(reg);
+    setUserModalError("");
+  }
+    const reg=[{id: 1, name: "John Doe", email: "john@example.com", phone: "123-456-7890"}, {id: 2, name: "Jane Smith", email: "jane@example.com", phone: "123-456-7890"}]
+
   const navigate = useNavigate();
   const [eventData, setEventData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -87,13 +110,14 @@ const ManageEvents = () => {
         ...event,
         Status: status,
         FormattedFromTime: formattedFromTime,
-        FormattedToTime: formattedToTime
+        FormattedToTime: formattedToTime,
+        regCount: 120, // Placeholder for registration count
       };
     });
 
     // // console.log(updatedEvents)
     setEventData(updatedEvents)
-    
+
   }
 
   useEffect(() => {
@@ -124,10 +148,10 @@ const ManageEvents = () => {
   const confirmDelete = (id) => setDeleteId(id);
   const cancelDelete = () => setDeleteId(null);
 
-  async function handleDeleteConfirmed () {
+  async function handleDeleteConfirmed() {
 
     try {
-        await axios.delete(`${process.env.REACT_APP_NETWORK}/deleteEvent/${deleteId}`, {
+      await axios.delete(`${process.env.REACT_APP_NETWORK}/deleteEvent/${deleteId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -136,20 +160,20 @@ const ManageEvents = () => {
     } catch (error) {
       console.info("Reload");
       return null;
-    }    
+    }
     setDeleteId(false);
     fetchEvents();
 
   };
 
-  const filteredEvents = eventData.filter( (event) => {
+  const filteredEvents = eventData.filter((event) => {
     // Case-insensitive search on Name (not title)
     const matchName = event.Name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Assuming filters.status and filters.type are still relevant and event has those properties
-    const matchStatus = filters.status ? event.status === filters.status : true;
-    const matchcategory = filters.category
-      ? event.category === filters.category
+    // Compare using the actual properties returned/normalized on events
+    const matchStatus = filters.status ? event.Status === filters.status : true;
+    const matchCategory = filters.category
+      ? event.Category === filters.category
       : true;
 
 
@@ -162,18 +186,17 @@ const ManageEvents = () => {
 
 
     const matchDate = (
-      (!fromDate || eventTo >= fromDate) && 
+      (!fromDate || eventTo >= fromDate) &&
       (!toDate || eventFrom <= toDate)
     );
 
-    return matchName && matchStatus && matchcategory && matchDate;
+    return matchName && matchStatus && matchCategory && matchDate;
   });
 
 
 
   const statusOptions = [...new Set(eventData.map((e) => e.Status))];
   const typeOptions = [...new Set(eventData.map((e) => e.Category))];
-
 
   return (
     <SidebarLayout>
@@ -246,7 +269,7 @@ const ManageEvents = () => {
                       Date Range
                     </label>
                     <input
-                      category="date"
+                      type="date"
                       className="w-full border px-2 py-1 rounded text-sm mb-1"
                       value={filters.fromDate}
                       onChange={(e) =>
@@ -255,7 +278,7 @@ const ManageEvents = () => {
                     />
                     <h2 className="text-center text-sm">to</h2>
                     <input
-                      category="date"
+                      type="date"
                       className="w-full border px-2 py-1 rounded text-sm"
                       value={filters.toDate}
                       onChange={(e) =>
@@ -275,11 +298,11 @@ const ManageEvents = () => {
                       }
                     >
                       <option value="">All</option>
-                      {/* {categoryOptions.map((t, i) => (
+                      {typeOptions.map((t, i) => (
                         <option key={i} value={t}>
                           {t}
                         </option>
-                      ))} */}
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -297,7 +320,7 @@ const ManageEvents = () => {
                   {Object.keys(visibleCols).map((key) => (
                     <label key={key} className="block text-sm mb-2">
                       <input
-                        category="checkbox"
+                        type="checkbox"
                         checked={visibleCols[key]}
                         onChange={() =>
                           setVisibleCols({
@@ -325,6 +348,7 @@ const ManageEvents = () => {
             { key: "FormattedToTime", label: "To" },
             { key: "Category", label: "Category" },
             { key: "Status", label: "Status" },
+            { key: "regCount", label: "Registrations" },
 
           ]}
           rows={filteredEvents.map((event) => ({
@@ -334,13 +358,67 @@ const ManageEvents = () => {
                 <FaEdit
                   className="text-[#F48F0F] cursor-pointer"
                   onClick={() =>
-                    navigate(`/Admin/Edit-Event/${event.ID}`, {state: { event}})
+                    navigate(`/Admin/Edit-Event/${event.ID}`, { state: { event } })
                   }
                 />
                 <FaTrash
                   className="text-[#F48F0F] cursor-pointer ml-4"
                   onClick={() => confirmDelete(event.ID)}
                 />
+                <Users
+                  className="text-[#F48F0F] cursor-pointer ml-4"
+                  onClick={() => showUser(event.ID)}
+                  title="Show Registered Users"
+                />
+        {/* Registered Users Modal */}
+        {showUserModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                onClick={closeUserModal}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Registered Users</h2>
+              {userModalLoading ? (
+                <div className="text-center py-8">Loading...</div>
+              ) : userModalError ? (
+                <div className="text-red-500 text-center py-8">{userModalError}</div>
+              ) : registeredUsers.length === 0 ? (
+                <div className="text-center py-8">No users registered for this event.</div>
+              ) : (
+                <ul className="divide-y divide-gray-200 max-h-80 overflow-y-auto">
+                  {registeredUsers.map((user, idx) => (
+                    <li key={user.id || idx} className="py-2 px-1 flex flex-col">
+                      <span className="font-medium">{user.name || user.fullName || user.email || "Unknown User"}</span>
+                      {user.email && <span className="text-sm text-gray-500">{user.email}</span>}
+                      {user.phone && <span className="text-sm text-gray-500">{user.phone}</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+
+                {event.Status == "ongoing" ?
+                  <TicketCheck
+                    className="text-[#F48F0F] cursor-pointer ml-4"
+                    onClick={() =>
+                      navigate("/Admin/Event-Registration", { state: { event } })
+                    }
+                  /> :
+                  event.Status == "completed" ?
+                  <CircleCheckBig
+                    className="text-green-400 cursor-not-allowed ml-4"
+                  />:
+                  <Clock
+                    className="text-gray-400 cursor-not-allowed ml-4"
+                  />
+                }
+
               </>
             ),
           }))}
