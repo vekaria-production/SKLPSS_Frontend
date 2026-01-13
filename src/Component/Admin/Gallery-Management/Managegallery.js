@@ -7,10 +7,10 @@ import events from "../../../assets/eventsarray";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import axios from "axios";
 
-async function getEventsData({  offset = 0, limit = 100 } = {}) {
+async function getEventsData({ offset = 0, limit = 100 } = {}) {
   try {
     const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
-      params: {  offset, limit },
+      params: { offset, limit },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -39,7 +39,7 @@ const ManageEvents = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     status: "",
-    type: "",
+    category: "",
     fromDate: "",
     toDate: "",
   });
@@ -124,9 +124,9 @@ const ManageEvents = () => {
 
     try {
       await axios.delete(`${process.env.REACT_APP_NETWORK}/deleteEvent/${ID}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
       // let data = response.data;
       // if (typeof data === 'string') {
@@ -137,8 +137,8 @@ const ManageEvents = () => {
     } catch (error) {
       console.info("Reload");
       return null;
-    
-      
+
+
     }
   }
 
@@ -150,33 +150,27 @@ const ManageEvents = () => {
     // // console.log(eventData)
     setDeleteId(null);
   };
-  const filteredEvents = eventData.filter( (event) => {
-    // Case-insensitive search on Name (not title)
+  const filteredEvents = eventData.filter((event) => {
+    // Case-insensitive search on Name
     const matchName = event.Name?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // Assuming filters.status and filters.type are still relevant and event has those properties
-    const matchStatus = filters.status ? event.status === filters.status : true;
-    const matchType = filters.type ? event.type === filters.type : true;
-
-    // Using 'From' and 'To' date fields for filtering date range
+    // Match status
+    const matchStatus = filters.status ? event.Status === filters.status : true;
+    // Match category
+    const matchCategory = filters.category ? event.Category === filters.category : true;
+    // Date range
     const eventFrom = new Date(event.From);
     const eventTo = new Date(event.To);
-
     const fromDate = filters.fromDate ? new Date(filters.fromDate) : null;
     const toDate = filters.toDate ? new Date(filters.toDate) : null;
-
-    // Check if event's date range overlaps with filter date range
-    // For example, event is valid if its period intersects the filter range
     const matchDate = (
-      (!fromDate || eventTo >= fromDate) && 
+      (!fromDate || eventTo >= fromDate) &&
       (!toDate || eventFrom <= toDate)
     );
-
-    return matchName && matchStatus && matchType && matchDate;
+    return matchName && matchStatus && matchCategory && matchDate;
   });
 
-  const statusOptions = [...new Set(events.map((e) => e.status))];
-  const typeOptions = [...new Set(events.map((e) => e.type))];
+  const statusOptions = [...new Set(eventData.map((e) => e.Status))];
+  const categoryOptions = [...new Set(eventData.map((e) => e.Category))];
 
   return (
     <SidebarLayout>
@@ -254,13 +248,13 @@ const ManageEvents = () => {
                     </label>
                     <select
                       className="w-full border px-2 py-1 rounded text-sm"
-                      value={filters.type}
+                      value={filters.category}
                       onChange={(e) =>
-                        setFilters({ ...filters, type: e.target.value })
+                        setFilters({ ...filters, category: e.target.value })
                       }
                     >
                       <option value="">All</option>
-                      {typeOptions.map((t, i) => (
+                      {categoryOptions.map((t, i) => (
                         <option key={i} value={t}>
                           {t}
                         </option>
@@ -316,7 +310,7 @@ const ManageEvents = () => {
                 <FaEdit
                   className="text-[#F48F0F] cursor-pointer"
                   onClick={() =>
-                    navigate(`/Admin/Edit-Gallery/${event.ID}`, {state : {event}})
+                    navigate(`/Admin/Edit-Gallery/${event.ID}`, { state: { event } })
                   }
                 />
                 {/* <FaTrash
