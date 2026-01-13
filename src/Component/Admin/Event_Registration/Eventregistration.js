@@ -104,6 +104,7 @@ export default function QrScanner() {
 
         setLoading(true);
         try {
+          
           const res = await axios.get(
             `${process.env.REACT_APP_NETWORK}/verify_qr/${qrToken}`
           );
