@@ -31,6 +31,9 @@ import VideoForm from "../../Component/Pages/Education/Teacher/VideoForm";
 import Submission from "../../Component/Pages/Education/Teacher/Submission";
 import QrScanner from "../../Component/Admin/Event_Registration/Eventregistration";
 import PrivateRoute from "./PrivateRoute";
+import DocumentManagement from "../../Component/Admin/Document_Management/DocumentManagement";
+import MeetingManagement from "../../Component/Admin/Meeting_Notes_Management/MeetingManagement";
+
 function RouteMmgmt() {
   return (
     <BrowserRouter>
@@ -55,7 +58,9 @@ function RouteMmgmt() {
         {/* <Route path="/Admin/Education" element={<PrivateRoute><Edu_management /></PrivateRoute>} /> */}
         <Route path="/Admin/Event-Registration" element={<PrivateRoute><QrScanner /></PrivateRoute>} />
         <Route path="/Admin/Settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-        
+        <Route path="/Admin/Document-Management" element={<PrivateRoute><DocumentManagement /></PrivateRoute>} />
+        <Route path="/Admin/Meeting-Notes-Management" element={<PrivateRoute><MeetingManagement /></PrivateRoute>} />
+
         <Route path="/Education/Student" element={<StudentDashboard />} />
         <Route path="/Education/Student/Courses" element={<Courses />} />
         <Route path="/Education/Student/Settings" element={<StudentSettings />} />

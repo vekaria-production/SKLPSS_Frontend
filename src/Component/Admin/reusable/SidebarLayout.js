@@ -117,14 +117,14 @@ const SidebarLayout = ({ children }) => {
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
             /> */}
-            {/* <SidebarLink
+            <SidebarLink
               icon={<TicketCheck />}
               label="Tickets"
               to="/Admin/Event-Registration"
               collapsed={isCollapsed && !isMobile}
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
-            /> */}
+            />
             {currentUser.role === "admin" && (
               <SidebarLink
                 icon={<SettingsIcon />}
