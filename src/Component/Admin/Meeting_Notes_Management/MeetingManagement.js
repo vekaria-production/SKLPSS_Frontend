@@ -57,7 +57,7 @@ const MeetingManagement = () => {
           <thead className="border-b">
             <tr>
               <th className="p-2 text-left">Title</th>
-              <th>Status</th>
+              {/* <th>Status</th> */}
               <th>Start</th>
               <th>End</th>
               <th>Actions</th>

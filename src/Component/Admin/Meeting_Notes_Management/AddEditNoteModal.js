@@ -3,15 +3,15 @@ import axios from "axios";
 
 const AddEditNoteModal = ({ meetingId, note, onClose, onSaved }) => {
   const [text, setText] = useState(note.note || "");
-  const userId = localStorage.getItem("userId");
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleSave = async () => {
     const payload = {
       MeetingId: meetingId,
-      UserId: userId,
+      User: user,
       Note: text,
     };
-
+    console.log(payload);
     if (note.noteId) {
       await axios.put(
         `${process.env.REACT_APP_NETWORK}/meetingNotes/${note.noteId}`,

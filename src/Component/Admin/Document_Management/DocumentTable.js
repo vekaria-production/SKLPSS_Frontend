@@ -8,7 +8,7 @@ const DocumentTable = ({ documents, onDelete }) => {
       cols={[
         { key: "DocumentName", label: "Document Name" },
         { key: "Category", label: "Category" },
-        { key: "UploadedBy", label: "Uploaded By (ID)" },
+        // { key: "UploadedBy", label: "Uploaded By (ID)" },
         { key: "Status", label: "Status" },
         { key: "CreatedAt", label: "Uploaded On" },
       ]}

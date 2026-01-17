@@ -45,7 +45,8 @@ const LoginForm = () => {
       );
 
       const data = response.data;
-
+      // console.log(userName, "login response data");
+      localStorage.setItem("user", userName);
       // Expecting backend to return access_token, refresh_token, and permissions
       login(data.access_token, data.refresh_token, data.permissions || [], userName) ;
       // Store login info

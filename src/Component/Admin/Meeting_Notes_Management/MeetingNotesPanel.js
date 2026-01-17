@@ -6,15 +6,15 @@ import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 const MeetingNotesPanel = ({ meeting, onClose }) => {
   const [notes, setNotes] = useState([]);
   const [editNote, setEditNote] = useState(null);
-  const userId = localStorage.getItem("userId");
-
+  const user = JSON.parse(localStorage.getItem("user"));
+  // console.log("MeetingNotesPanel user:", user);
   const fetchNotes = async () => {
     const res = await axios.get(
       `${process.env.REACT_APP_NETWORK}/meetingNotes`,
       {
         params: {
           meetingId: meeting.meetingId,
-          userId,
+          user,
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

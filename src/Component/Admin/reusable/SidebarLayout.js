@@ -9,6 +9,8 @@ import {
   X,
   Settings as SettingsIcon,
   BookOpen,
+  FileText,
+  Presentation,
   TicketCheck,
 } from "lucide-react";
 import Topbar from "./Topbar";
@@ -117,10 +119,27 @@ const SidebarLayout = ({ children }) => {
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
             /> */}
+
+            <SidebarLink
+              icon={<FileText />}
+              label="Documents"
+              to="/Admin/Document-Management"
+              collapsed={isCollapsed && !isMobile}
+              isMobile={isMobile}
+              setIsCollapsed={setIsCollapsed}
+            />
             <SidebarLink
               icon={<TicketCheck />}
               label="Tickets"
               to="/Admin/Event-Registration"
+              collapsed={isCollapsed && !isMobile}
+              isMobile={isMobile}
+              setIsCollapsed={setIsCollapsed}
+            />
+            <SidebarLink
+              icon={<Presentation />}
+              label="Meetings"
+              to="/Admin/Meeting-Notes-Management"
               collapsed={isCollapsed && !isMobile}
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}
