@@ -12,6 +12,7 @@ import {
   FileText,
   Presentation,
   TicketCheck,
+  UserPlus,
 } from "lucide-react";
 import Topbar from "./Topbar";
 import { useAuth } from "../../../Context/Auth/AuthContext";
@@ -23,7 +24,7 @@ const SidebarLayout = ({ children }) => {
 
   const { permissions } = useAuth();
   const hasPermission = (field) => permissions.includes(`${field}`);
-  
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -53,12 +54,11 @@ const SidebarLayout = ({ children }) => {
         <div
           className={`fixed sm:static top-0 left-0 h-full bg-[#F2E6DA] border-r border-[#E1D5C9] shadow-md z-50
             transition-all duration-300 ease-in-out
-            ${
-              isMobile
-                ? isCollapsed
-                  ? "-translate-x-full w-64"
-                  : "translate-x-0 w-64"
-                : isCollapsed
+            ${isMobile
+              ? isCollapsed
+                ? "-translate-x-full w-64"
+                : "translate-x-0 w-64"
+              : isCollapsed
                 ? "w-16"
                 : "w-64"
             }
@@ -93,14 +93,14 @@ const SidebarLayout = ({ children }) => {
               />
             )}
             {hasPermission("view_gallery") && (
-            <SidebarLink
-              icon={<Image />}
-              label="Gallery"
-              to="/Admin/Gallery"
-              collapsed={isCollapsed && !isMobile}
-              isMobile={isMobile}
-              setIsCollapsed={setIsCollapsed}
-            />
+              <SidebarLink
+                icon={<Image />}
+                label="Gallery"
+                to="/Admin/Gallery"
+                collapsed={isCollapsed && !isMobile}
+                isMobile={isMobile}
+                setIsCollapsed={setIsCollapsed}
+              />
             )}
 
             <SidebarLink
@@ -129,8 +129,16 @@ const SidebarLayout = ({ children }) => {
               setIsCollapsed={setIsCollapsed}
             />
             <SidebarLink
+              icon={<UserPlus />}
+              label="Registration"
+              to="/Admin/Register-User"
+              collapsed={isCollapsed && !isMobile}
+              isMobile={isMobile}
+              setIsCollapsed={setIsCollapsed}
+            />
+            <SidebarLink
               icon={<TicketCheck />}
-              label="Tickets"
+              label="Check-In"
               to="/Admin/Event-Registration"
               collapsed={isCollapsed && !isMobile}
               isMobile={isMobile}
@@ -185,11 +193,10 @@ const SidebarLink = ({
     <Link
       to={to}
       onClick={handleClick}
-      className={`flex items-center gap-3 p-3 rounded-lg transition ${
-        isActive
+      className={`flex items-center gap-3 p-3 rounded-lg transition ${isActive
           ? "bg-[#F48F0F]/50 text-[#292929] font-semibold"
           : "hover:bg-[#FDF8F3]"
-      }`}
+        }`}
     >
       <div>{icon}</div>
       {!collapsed && <span className="text-sm font-medium">{label}</span>}

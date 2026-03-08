@@ -34,21 +34,40 @@ const ManageEvents = () => {
   const [userModalLoading, setUserModalLoading] = useState(false);
   const [userModalError, setUserModalError] = useState("");
 
+  const [totalRegCount, setTotalRegCount] = useState(0);
+
   // Fetch registered users for an event
   async function showUser(eventId) {
     setShowUserModal(true);
     setUserModalLoading(true);
     setUserModalError("");
-    // Backend call for showing users registered in event with eventId
-    setUserModalLoading(false);
+    setTotalRegCount(0);
+    setRegisteredUsers([]);
+
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_NETWORK}/event_registrations/${eventId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (response.data) {
+        setTotalRegCount(response.data.total_registrations || 0);
+        setRegisteredUsers(response.data.registrations || []);
+      }
+    } catch (err) {
+      console.error(err);
+      setUserModalError("Failed to load registrations.");
+    } finally {
+      setUserModalLoading(false);
+    }
   }
 
   function closeUserModal() {
     setShowUserModal(false);
-    setRegisteredUsers(reg);
+    setRegisteredUsers([]);
+    setTotalRegCount(0);
     setUserModalError("");
   }
-    const reg=[{id: 1, name: "John Doe", email: "john@example.com", phone: "123-456-7890"}, {id: 2, name: "Jane Smith", email: "jane@example.com", phone: "123-456-7890"}]
 
   const navigate = useNavigate();
   const [eventData, setEventData] = useState([]);
@@ -111,7 +130,6 @@ const ManageEvents = () => {
         Status: status,
         FormattedFromTime: formattedFromTime,
         FormattedToTime: formattedToTime,
-        regCount: 120, // Placeholder for registration count
       };
     });
 
@@ -348,7 +366,6 @@ const ManageEvents = () => {
             { key: "FormattedToTime", label: "To" },
             { key: "Category", label: "Category" },
             { key: "Status", label: "Status" },
-            { key: "regCount", label: "Registrations" },
 
           ]}
           rows={filteredEvents.map((event) => ({
@@ -370,38 +387,52 @@ const ManageEvents = () => {
                   onClick={() => showUser(event.ID)}
                   title="Show Registered Users"
                 />
-        {/* Registered Users Modal */}
-        {showUserModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
-                onClick={closeUserModal}
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              <h2 className="text-xl font-semibold mb-4">Registered Users</h2>
-              {userModalLoading ? (
-                <div className="text-center py-8">Loading...</div>
-              ) : userModalError ? (
-                <div className="text-red-500 text-center py-8">{userModalError}</div>
-              ) : registeredUsers.length === 0 ? (
-                <div className="text-center py-8">No users registered for this event.</div>
-              ) : (
-                <ul className="divide-y divide-gray-200 max-h-80 overflow-y-auto">
-                  {registeredUsers.map((user, idx) => (
-                    <li key={user.id || idx} className="py-2 px-1 flex flex-col">
-                      <span className="font-medium">{user.name || user.fullName || user.email || "Unknown User"}</span>
-                      {user.email && <span className="text-sm text-gray-500">{user.email}</span>}
-                      {user.phone && <span className="text-sm text-gray-500">{user.phone}</span>}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        )}
+                {/* Registered Users Modal */}
+                {showUserModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+                      <button
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                        onClick={closeUserModal}
+                        aria-label="Close"
+                      >
+                        &times;
+                      </button>
+                      <h2 className="text-xl font-semibold mb-4">Registered Users ({totalRegCount})</h2>
+                      {userModalLoading ? (
+                        <div className="text-center py-8">Loading...</div>
+                      ) : userModalError ? (
+                        <div className="text-red-500 text-center py-8">{userModalError}</div>
+                      ) : registeredUsers.length === 0 ? (
+                        <div className="text-center py-8">No users registered for this event.</div>
+                      ) : (
+                        <ul className="divide-y divide-gray-200 max-h-80 overflow-y-auto pr-2">
+                          {registeredUsers.map((user, idx) => (
+                            <li key={user.registration_id || idx} className="py-3 px-2 flex items-center justify-between hover:bg-gray-50 rounded-md transition-colors">
+                              <div className="flex flex-col">
+                                <span className="font-medium text-gray-800">
+                                  {user.phone_number} {user.is_member ? `(Member: ${user.member_id})` : "(Guest)"}
+                                </span>
+                                {user.registered_at && (
+                                  <span className="text-xs text-gray-500 mt-0.5">
+                                    Registered: {new Date(user.registered_at).toLocaleString()}
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                {user.checked_in ? (
+                                  <span className="bg-green-100 text-green-700 text-[10px] px-2 py-1 uppercase tracking-wider rounded-full font-bold">Checked In</span>
+                                ) : (
+                                  <span className="bg-orange-100 text-orange-600 text-[10px] px-2 py-1 uppercase tracking-wider rounded-full font-bold">Pending</span>
+                                )}
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {event.Status == "ongoing" ?
                   <TicketCheck
@@ -411,12 +442,12 @@ const ManageEvents = () => {
                     }
                   /> :
                   event.Status == "completed" ?
-                  <CircleCheckBig
-                    className="text-green-400 cursor-not-allowed ml-4"
-                  />:
-                  <Clock
-                    className="text-gray-400 cursor-not-allowed ml-4"
-                  />
+                    <CircleCheckBig
+                      className="text-green-400 cursor-not-allowed ml-4"
+                    /> :
+                    <Clock
+                      className="text-gray-400 cursor-not-allowed ml-4"
+                    />
                 }
 
               </>

@@ -29,6 +29,7 @@ import AssignedCourses from "../../Component/Pages/Education/Teacher/Assigned_co
 import AssignmentForm from "../../Component/Pages/Education/Teacher/AssignmentForm";
 import VideoForm from "../../Component/Pages/Education/Teacher/VideoForm";
 import Submission from "../../Component/Pages/Education/Teacher/Submission";
+import RegisterUser from "../../Component/Admin/Event_Registration/RegisterUser";
 import QrScanner from "../../Component/Admin/Event_Registration/Eventregistration";
 import PrivateRoute from "./PrivateRoute";
 import DocumentManagement from "../../Component/Admin/Document_Management/DocumentManagement";
@@ -56,6 +57,7 @@ function RouteMmgmt() {
         <Route path="/Admin/:Type/:Id" element={<PrivateRoute><EventForm /></PrivateRoute>} />
         <Route path="/Admin/Edit-Gallery/:Id" element={<PrivateRoute><ManagePhotos /></PrivateRoute>} />
         {/* <Route path="/Admin/Education" element={<PrivateRoute><Edu_management /></PrivateRoute>} /> */}
+        <Route path="/Admin/Register-User" element={<PrivateRoute><RegisterUser /></PrivateRoute>} />
         <Route path="/Admin/Event-Registration" element={<PrivateRoute><QrScanner /></PrivateRoute>} />
         <Route path="/Admin/Settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
         <Route path="/Admin/Document-Management" element={<PrivateRoute><DocumentManagement /></PrivateRoute>} />
