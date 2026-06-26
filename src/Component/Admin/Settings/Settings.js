@@ -8,6 +8,7 @@ import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import AddRoleModal from "../reusable/AddRoleModal";
 import EditUserModal from "../reusable/EditUserModal";
 import axios from "axios";
+import useDebounce from "../../../hooks/useDebounce";
 
 function convertRoles(data) {
 
@@ -68,6 +69,16 @@ const Settings = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
+
+  const [roleSearchTerm, setRoleSearchTerm] = useState("");
+  const [showRoleFiltersRow, setShowRoleFiltersRow] = useState(false);
+
+  const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("");
+  const [showUserFiltersRow, setShowUserFiltersRow] = useState(false);
+
+  const debouncedRoleSearchTerm = useDebounce(roleSearchTerm, 400);
+  const debouncedUserSearchTerm = useDebounce(userSearchTerm, 400);
 
   async function handleDelete(){
     if (!itemToDelete) return;
@@ -165,52 +176,42 @@ const Settings = () => {
     }
   };
 
-  async function fetchRoles() {
+  async function fetchRoles(nameVal = debouncedRoleSearchTerm) {
           try {
-            // Fetch members
-            const roles = await axios.get(
+            const response = await axios.get(
               `${process.env.REACT_APP_NETWORK}/roles`,
               {
+                params: { name: nameVal || undefined },
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
               }
             );
             
-            let roleData = roles.data;
-            if (typeof membersData === 'string') {
-              roleData = JSON.parse(roleData);
-            }
-            // console.log(convertRoles(roleData));
+            let roleData = response.data;
             setRoles(convertRoles(roleData));
-            console.log(roleData);
-            // return roleData
-            // setMembersList(membersData);
-
-            // Use the position from useOptions
-            // setPositionList(position);
           } catch (error) {
             console.error("Error fetching data:", error);
           }
   }
 
-  async function fetchUsers() {
+  async function fetchUsers(usernameVal = debouncedUserSearchTerm, roleVal = userRoleFilter) {
           try {
-            // Fetch members
-            const users = await axios.get(
+            const response = await axios.get(
               `${process.env.REACT_APP_NETWORK}/users`,
               {
+                params: { 
+                  limit: 1000,
+                  username: usernameVal || undefined,
+                  role: roleVal || undefined
+                },
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
               }
             );
             
-            let userData = users.data;
-            if (typeof membersData === 'string') {
-              userData = JSON.parse(userData);
-            }
-            // console.log(userData);
+            let userData = response.data;
             setUsers(userData);
           } catch (error) {
             console.error("Error fetching data:", error);
@@ -218,16 +219,18 @@ const Settings = () => {
   }
 
   useEffect(() => {
+    fetchRoles(debouncedRoleSearchTerm);
+  }, [debouncedRoleSearchTerm]);
 
-
-    fetchRoles();
-    fetchUsers();
-  }, [])
+  useEffect(() => {
+    fetchUsers(debouncedUserSearchTerm, userRoleFilter);
+  }, [debouncedUserSearchTerm, userRoleFilter]);
 
   const roleCols = [
     {
       key: "name",
       label: "Role Name",
+      filterable: true,
     },
     {
       key: "modules",
@@ -241,9 +244,8 @@ const Settings = () => {
   ];
 
   const userCols = [
-    { key: "username", label: "User Name" },
-    // { key: "email", label: "Email" },
-    { key: "roles", label: "Roles" },
+    { key: "username", label: "User Name", filterable: true },
+    { key: "roles", label: "Roles", filterable: true },
   ];
 
 
@@ -321,6 +323,34 @@ const Settings = () => {
                   </>
                 ),
             }))}
+            showFiltersRow={showRoleFiltersRow}
+            onToggleFilters={() => setShowRoleFiltersRow(!showRoleFiltersRow)}
+            filterRow={showRoleFiltersRow ? (col) => {
+              if (col.key === "name") {
+                return (
+                  <input
+                    type="text"
+                    placeholder="Filter name..."
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                    value={roleSearchTerm}
+                    onChange={(e) => setRoleSearchTerm(e.target.value)}
+                  />
+                );
+              }
+              if (col.key === "actions") {
+                if (roleSearchTerm) {
+                  return (
+                    <button
+                      onClick={() => setRoleSearchTerm("")}
+                      className="text-xs text-[#F48F0F] hover:underline font-semibold"
+                    >
+                      Clear
+                    </button>
+                  );
+                }
+              }
+              return null;
+            } : null}
           />
         </section>
 
@@ -354,6 +384,53 @@ const Settings = () => {
                 </>
               ),
             }))}
+            showFiltersRow={showUserFiltersRow}
+            onToggleFilters={() => setShowUserFiltersRow(!showUserFiltersRow)}
+            filterRow={showUserFiltersRow ? (col) => {
+              if (col.key === "username") {
+                return (
+                  <input
+                    type="text"
+                    placeholder="Filter username..."
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                    value={userSearchTerm}
+                    onChange={(e) => setUserSearchTerm(e.target.value)}
+                  />
+                );
+              }
+              if (col.key === "roles") {
+                return (
+                  <select
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                    value={userRoleFilter}
+                    onChange={(e) => setUserRoleFilter(e.target.value)}
+                  >
+                    <option value="">All</option>
+                    {roles.map((r) => (
+                      <option key={r.id} value={r.name}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                );
+              }
+              if (col.key === "actions") {
+                if (userSearchTerm || userRoleFilter) {
+                  return (
+                    <button
+                      onClick={() => {
+                        setUserSearchTerm("");
+                        setUserRoleFilter("");
+                      }}
+                      className="text-xs text-[#F48F0F] hover:underline font-semibold"
+                    >
+                      Clear
+                    </button>
+                  );
+                }
+              }
+              return null;
+            } : null}
           />
         </section>
 

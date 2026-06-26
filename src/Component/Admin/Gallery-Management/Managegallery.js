@@ -6,11 +6,20 @@ import CustomTable from "../reusable/CustomTable";
 import events from "../../../assets/eventsarray";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import axios from "axios";
+import useDebounce from "../../../hooks/useDebounce";
 
-async function getEventsData({ offset = 0, limit = 100 } = {}) {
+async function getEventsData({ offset = 0, limit = 100, search, category, status, fromDate, toDate } = {}) {
   try {
     const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
-      params: { offset, limit },
+      params: { 
+        offset, 
+        limit, 
+        search: search || undefined,
+        category: category || undefined,
+        status: status || undefined,
+        from_date: fromDate ? new Date(fromDate).toISOString() : undefined,
+        to_date: toDate ? new Date(toDate).toISOString() : undefined
+      },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -29,14 +38,14 @@ const ManageEvents = () => {
   const [eventData, setEventData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCols, setVisibleCols] = useState({
-    title: true,
-    date: true,
-    type: true,
-    status: true,
+    Name: true,
+    FormattedFromTime: true,
+    FormattedToTime: true,
+    Status: true,
   });
   const now = new Date();
   const [showSettings, setShowSettings] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFiltersRow, setShowFiltersRow] = useState(false);
   const [filters, setFilters] = useState({
     status: "",
     category: "",
@@ -44,8 +53,17 @@ const ManageEvents = () => {
     toDate: "",
   });
 
-  async function fetchEvents() {
-    const result = await getEventsData();
+  const debouncedSearchTerm = useDebounce(searchTerm, 400);
+
+  async function fetchEvents(searchVal = debouncedSearchTerm, filterOpts = filters) {
+    const result = await getEventsData({
+      search: searchVal,
+      category: filterOpts.category,
+      status: filterOpts.status,
+      fromDate: filterOpts.fromDate,
+      toDate: filterOpts.toDate,
+    });
+    if (!result || !result.events) return;
     const updatedEvents = result.events.map(event => {
       const fromDate = new Date(event.From);
       const toDate = new Date(event.To);
@@ -85,13 +103,12 @@ const ManageEvents = () => {
       };
     });
 
-    // // console.log(updatedEvents)
     setEventData(updatedEvents)
   }
 
   useEffect(() => {
-    fetchEvents();
-  }, [])
+    fetchEvents(debouncedSearchTerm, filters);
+  }, [debouncedSearchTerm, filters.category, filters.status, filters.fromDate, filters.toDate]);
   const [deleteId, setDeleteId] = useState(null);
   const settingsRef = useRef();
   const filtersRef = useRef();
@@ -105,17 +122,10 @@ const ManageEvents = () => {
       ) {
         setShowSettings(false);
       }
-      if (
-        showFilters &&
-        filtersRef.current &&
-        !filtersRef.current.contains(e.target)
-      ) {
-        setShowFilters(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showSettings, showFilters]);
+  }, [showSettings]);
 
   const confirmDelete = (id) => setDeleteId(id);
   const cancelDelete = () => setDeleteId(null);
@@ -150,158 +160,79 @@ const ManageEvents = () => {
     // // console.log(eventData)
     setDeleteId(null);
   };
-  const filteredEvents = eventData.filter((event) => {
-    // Case-insensitive search on Name
-    const matchName = event.Name?.toLowerCase().includes(searchTerm.toLowerCase());
-    // Match status
-    const matchStatus = filters.status ? event.Status === filters.status : true;
-    // Match category
-    const matchCategory = filters.category ? event.Category === filters.category : true;
-    // Date range
-    const eventFrom = new Date(event.From);
-    const eventTo = new Date(event.To);
-    const fromDate = filters.fromDate ? new Date(filters.fromDate) : null;
-    const toDate = filters.toDate ? new Date(filters.toDate) : null;
-    const matchDate = (
-      (!fromDate || eventTo >= fromDate) &&
-      (!toDate || eventFrom <= toDate)
-    );
-    return matchName && matchStatus && matchCategory && matchDate;
-  });
+  const filteredEvents = eventData;
 
-  const statusOptions = [...new Set(eventData.map((e) => e.Status))];
-  const categoryOptions = [...new Set(eventData.map((e) => e.Category))];
+  const statusOptions = ["upcoming", "ongoing", "completed"];
+  const categoryOptions = ["General", "Religious", "Cultural", "Sports", "Education"];
 
   return (
     <SidebarLayout>
-      <div className="w-full bg-[#FDF8F3] p-6 relative">
+      <div className="w-full bg-[#FDF8F3] p-6 min-h-[550px] relative">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Gallery Management</h1>
         </div>
 
-        {/* Search and Icon Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div className="flex items-center bg-white rounded-full px-4 py-2 border border-gray-300 w-full sm:max-w-md">
-            <FaSearch className="text-gray-400 mr-2" />
-            <input
-              type="text"
-              placeholder="Search by Event Name"
-              className="outline-none w-full text-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        {/* Settings */}
+        <div className="flex justify-end mb-4 relative">
+          <div className="relative" ref={settingsRef}>
+            <FaCog
+              className="text-[#F48F0F] text-xl cursor-pointer hover:opacity-70 transition-transform hover:rotate-45 duration-300"
+              onClick={() => setShowSettings((prev) => !prev)}
             />
-          </div>
-
-          <div className="flex gap-4 self-end sm:self-auto">
-            {/* Filter */}
-            <div className="relative" ref={filtersRef}>
-              <FaFilter
-                className="text-[#F48F0F] text-xl cursor-pointer hover:opacity-70"
-                onClick={() => setShowFilters((prev) => !prev)}
-              />
-              {showFilters && (
-                <div className="absolute top-10 right-0 bg-white shadow-lg rounded-md p-4 z-20 w-72 max-w-[90vw] border border-gray-200 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Status
-                    </label>
-                    <select
-                      className="w-full border px-2 py-1 rounded text-sm"
-                      value={filters.status}
-                      onChange={(e) =>
-                        setFilters({ ...filters, status: e.target.value })
-                      }
-                    >
-                      <option value="">All</option>
-                      {statusOptions.map((s, i) => (
-                        <option key={i} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Date Range
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full border px-2 py-1 rounded text-sm mb-1"
-                      value={filters.fromDate}
-                      onChange={(e) =>
-                        setFilters({ ...filters, fromDate: e.target.value })
-                      }
-                    />
-                    <h2 className="text-center text-sm">to</h2>
-                    <input
-                      type="date"
-                      className="w-full border px-2 py-1 rounded text-sm"
-                      value={filters.toDate}
-                      onChange={(e) =>
-                        setFilters({ ...filters, toDate: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Category
-                    </label>
-                    <select
-                      className="w-full border px-2 py-1 rounded text-sm"
-                      value={filters.category}
-                      onChange={(e) =>
-                        setFilters({ ...filters, category: e.target.value })
-                      }
-                    >
-                      <option value="">All</option>
-                      {categoryOptions.map((t, i) => (
-                        <option key={i} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+            {showSettings && (
+              <div className="absolute top-10 right-0 w-60 bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl p-4 z-30 border border-gray-100 transition-all duration-200 ease-out origin-top-right">
+                <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 pb-1.5 border-b border-gray-100">
+                  Visible Columns
                 </div>
-              )}
-            </div>
-
-            {/* Column Settings */}
-            <div className="relative" ref={settingsRef}>
-              <FaCog
-                className="text-[#F48F0F] text-xl cursor-pointer hover:opacity-70"
-                onClick={() => setShowSettings((prev) => !prev)}
-              />
-              {showSettings && (
-                <div className="absolute top-10 right-0 bg-white shadow-lg rounded-md p-4 z-20 border border-gray-200">
-                  {Object.keys(visibleCols).map((key) => (
-                    <label key={key} className="block text-sm mb-2">
-                      <input
-                        type="checkbox"
-                        checked={visibleCols[key]}
-                        onChange={() =>
+                <div className="space-y-1.5">
+                  {Object.keys(visibleCols).map((key) => {
+                    const labels = {
+                      Name: "Event Name",
+                      FormattedFromTime: "From",
+                      FormattedToTime: "To",
+                      Status: "Status",
+                    };
+                    return (
+                      <div
+                        key={key}
+                        onClick={() =>
                           setVisibleCols({
                             ...visibleCols,
                             [key]: !visibleCols[key],
                           })
                         }
-                        className="mr-2"
-                      />
-                      Show {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </label>
-                  ))}
+                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#F48F0F]/10 cursor-pointer transition-all duration-150 group"
+                      >
+                        <span className="text-sm font-medium text-gray-600 group-hover:text-[#F48F0F] transition-colors duration-150 select-none">
+                          {labels[key] || key}
+                        </span>
+                        <div
+                          className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center ${
+                            visibleCols[key] ? "bg-[#F48F0F]" : "bg-gray-200"
+                          }`}
+                        >
+                          <div
+                            className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out transform ${
+                              visibleCols[key] ? "translate-x-4" : "translate-x-0"
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Event Table */}
         <CustomTable
           cols={[
-            { key: "Name", label: "Event Name" },
-            { key: "FormattedFromTime", label: "From" },
-            { key: "FormattedToTime", label: "To" },
-            { key: "Status", label: "Status" },
+            { key: "Name", label: "Event Name", filterable: true },
+            { key: "FormattedFromTime", label: "From", filterable: true },
+            { key: "FormattedToTime", label: "To", filterable: true },
+            { key: "Status", label: "Status", filterable: true },
           ]}
           rows={filteredEvents.map((event) => ({
             ...event,
@@ -321,6 +252,79 @@ const ManageEvents = () => {
             ),
           }))}
           visibleCols={visibleCols}
+          showFiltersRow={showFiltersRow}
+          onToggleFilters={() => setShowFiltersRow(!showFiltersRow)}
+          filterRow={showFiltersRow ? (col) => {
+            if (col.key === "Name") {
+              return (
+                <input
+                  type="text"
+                  placeholder="Filter name..."
+                  className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              );
+            }
+            if (col.key === "FormattedFromTime") {
+              return (
+                <input
+                  type="date"
+                  className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs font-normal bg-white"
+                  value={filters.fromDate}
+                  onChange={(e) =>
+                    setFilters({ ...filters, fromDate: e.target.value })
+                  }
+                />
+              );
+            }
+            if (col.key === "FormattedToTime") {
+              return (
+                <input
+                  type="date"
+                  className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs font-normal bg-white"
+                  value={filters.toDate}
+                  onChange={(e) =>
+                    setFilters({ ...filters, toDate: e.target.value })
+                  }
+                />
+              );
+            }
+            if (col.key === "Status") {
+              return (
+                <select
+                  className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                  value={filters.status}
+                  onChange={(e) =>
+                    setFilters({ ...filters, status: e.target.value })
+                  }
+                >
+                  <option value="">All</option>
+                  {statusOptions.map((s, i) => (
+                    <option key={i} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              );
+            }
+            if (col.key === "actions") {
+              if (filters.status || filters.fromDate || filters.toDate || searchTerm) {
+                return (
+                  <button
+                    onClick={() => {
+                      setFilters({ status: "", category: "", fromDate: "", toDate: "" });
+                      setSearchTerm("");
+                    }}
+                    className="text-xs text-[#F48F0F] hover:underline font-semibold"
+                  >
+                    Clear
+                  </button>
+                );
+              }
+            }
+            return null;
+          } : null}
         />
 
         {/* Delete Confirmation Modal */}

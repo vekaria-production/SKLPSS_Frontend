@@ -6,27 +6,32 @@ import DocumentTable from "./DocumentTable";
 import DocumentFilters from "./DocumentFilters";
 import UploadDocumentModal from "./UploadDocumentModal";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
+import useDebounce from "../../../hooks/useDebounce";
 
 const DocumentManagement = () => {
   const [documents, setDocuments] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    name: "",
     category: "",
+    status: "",
   });
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFiltersRow, setShowFiltersRow] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const fetchDocuments = async () => {
+  const debouncedSearchTerm = useDebounce(searchTerm, 400);
+
+  const fetchDocuments = async (nameVal = debouncedSearchTerm, filterOpts = filters) => {
     try {
       const res = await axios.get(
         `${process.env.REACT_APP_NETWORK}/documents`,
         {
           params: {
-            name: filters.name || undefined,
-            category: filters.category || undefined,
+            name: nameVal || undefined,
+            category: filterOpts.category || undefined,
+            status: filterOpts.status || undefined,
             offset: 0,
-            limit: 50,
+            limit: 1000,
           },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -40,8 +45,8 @@ const DocumentManagement = () => {
   };
 
   useEffect(() => {
-    fetchDocuments();
-  }, [filters]);
+    fetchDocuments(debouncedSearchTerm, filters);
+  }, [debouncedSearchTerm, filters.category, filters.status]);
 
   const handleDelete = async () => {
     try {
@@ -74,32 +79,23 @@ const DocumentManagement = () => {
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="flex justify-end mb-4 relative">
-          <FaFilter
-            className="icon-action text-xl"
-            onClick={() => setShowFilters(!showFilters)}
-          />
-          {showFilters && (
-            <DocumentFilters
-              filters={filters}
-              setFilters={setFilters}
-              onClose={() => setShowFilters(false)}
-            />
-          )}
-        </div>
-
         {/* Table */}
         <DocumentTable
           documents={documents}
           onDelete={setDeleteTarget}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filters={filters}
+          setFilters={setFilters}
+          showFiltersRow={showFiltersRow}
+          setShowFiltersRow={setShowFiltersRow}
         />
 
         {/* Upload */}
         {showUpload && (
           <UploadDocumentModal
             onClose={() => setShowUpload(false)}
-            onUploaded={fetchDocuments}
+            onUploaded={() => fetchDocuments(debouncedSearchTerm, filters)}
           />
         )}
 

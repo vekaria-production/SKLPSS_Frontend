@@ -5,11 +5,16 @@ import SidebarLayout from "../reusable/SidebarLayout";
 import CustomTable from "../reusable/CustomTable";
 import axios from "axios";
 import { QRCodeSVG } from "qrcode.react";
+import useDebounce from "../../../hooks/useDebounce";
 
 export default function RegisterUser() {
   const [eventData, setEventData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showFiltersRow, setShowFiltersRow] = useState(false);
+  const [filters, setFilters] = useState({ category: "", status: "" });
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 400);
 
   // Modal states
   const [showModal, setShowModal] = useState(false);
@@ -24,11 +29,17 @@ export default function RegisterUser() {
 
   const now = new Date();
 
-  async function fetchEvents() {
+  async function fetchEvents(searchVal = debouncedSearchTerm, filterOpts = filters) {
     setLoading(true);
     try {
       const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getEventList`, {
-        params: { offset: 0, limit: 100 },
+        params: { 
+          offset: 0, 
+          limit: 100,
+          search: searchVal || undefined,
+          category: filterOpts.category || undefined,
+          status: filterOpts.status || undefined,
+        },
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -77,8 +88,8 @@ export default function RegisterUser() {
   }
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    fetchEvents(debouncedSearchTerm, filters);
+  }, [debouncedSearchTerm, filters.category, filters.status]);
 
   const openRegisterModal = (event) => {
     setSelectedEvent(event);
@@ -139,29 +150,15 @@ export default function RegisterUser() {
     }
   };
 
-  const filteredEvents = eventData.filter((event) => {
-    return event.Name?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredEvents = eventData;
+
+  const categoryOptions = ["General", "Religious", "Cultural", "Sports", "Education"];
 
   return (
     <SidebarLayout>
       <div className="w-full bg-[#FDF8F3] p-6 relative min-h-screen">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Register User for Event</h1>
-        </div>
-
-        {/* Search */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex items-center bg-white rounded-full px-4 py-2 border border-gray-300 w-full sm:max-w-md">
-            <FaSearch className="text-gray-400 mr-2" />
-            <input
-              type="text"
-              placeholder="Search by Event Name"
-              className="outline-none w-full text-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
         </div>
 
         {/* Event Table */}
@@ -172,11 +169,11 @@ export default function RegisterUser() {
         ) : (
           <CustomTable
             cols={[
-              { key: "Name", label: "Event Name" },
+              { key: "Name", label: "Event Name", filterable: true },
               { key: "FormattedFromTime", label: "From" },
               { key: "FormattedToTime", label: "To" },
-              { key: "Category", label: "Category" },
-              { key: "Status", label: "Status" },
+              { key: "Category", label: "Category", filterable: true },
+              { key: "Status", label: "Status", filterable: true },
             ]}
             rows={filteredEvents.map((event) => ({
               ...event,
@@ -198,8 +195,72 @@ export default function RegisterUser() {
               Category: true,
               Status: true,
             }}
+            showFiltersRow={showFiltersRow}
+            onToggleFilters={() => setShowFiltersRow(!showFiltersRow)}
+            filterRow={showFiltersRow ? (col) => {
+              if (col.key === "Name") {
+                return (
+                  <input
+                    type="text"
+                    placeholder="Filter name..."
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                );
+              }
+              if (col.key === "Category") {
+                return (
+                  <select
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                    value={filters.category}
+                    onChange={(e) =>
+                      setFilters({ ...filters, category: e.target.value })
+                    }
+                  >
+                    <option value="">All</option>
+                    {categoryOptions.map((c, i) => (
+                      <option key={i} value={c}>{c}</option>
+                    ))}
+                  </select>
+                );
+              }
+              if (col.key === "Status") {
+                return (
+                  <select
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                    value={filters.status}
+                    onChange={(e) =>
+                      setFilters({ ...filters, status: e.target.value })
+                    }
+                  >
+                    <option value="">All</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                );
+              }
+              if (col.key === "actions") {
+                if (filters.category || filters.status || searchTerm) {
+                  return (
+                    <button
+                      onClick={() => {
+                        setFilters({ category: "", status: "" });
+                        setSearchTerm("");
+                      }}
+                      className="text-xs text-[#F48F0F] hover:underline font-semibold"
+                    >
+                      Clear
+                    </button>
+                  );
+                }
+              }
+              return null;
+            } : null}
           />
-        )}
+        )
+      }
 
         {/* Registration Modal */}
         {showModal && selectedEvent && (

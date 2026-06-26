@@ -10,7 +10,9 @@ import Login from "../../Component/Admin/reusable/Login";
 import Event from "../../Component/Admin/Event-Management/ManageEvents";
 import Managegallery from "../../Component/Admin/Gallery-Management/Managegallery";
 import ManageMembers from "../../Component/Admin/Member-Management/ManageMembers";
+import ManageGuests from "../../Component/Admin/Member-Management/ManageGuests";
 import GalleryEvent from "../../Component/Pages/Gallary/GalleryEvent";
+import PublicUpload from "../../Component/Pages/Gallary/PublicUpload";
 import Education from "../../Component/Pages/Education/Education";
 import MembershipForm from "../../Component/Pages/Membership/MembershipForm";
 import EventForm from "../../Component/Admin/Event-Management/Eventform";
@@ -44,6 +46,7 @@ function RouteMmgmt() {
         <Route path="/events" element={<EventsSection />} />
         <Route path="/Gallery" element={<Gallary />} />
         <Route path="/Gallery/:Id/:eventName" element={<GalleryEvent />} />
+        <Route path="/public-upload/:token" element={<PublicUpload />} />
         <Route path="/Education" element={<Education />} />
         <Route path="/Membership" element={<MembershipForm />} />
 
@@ -54,6 +57,7 @@ function RouteMmgmt() {
         <Route path="/Admin/events/Manage_Categories" element={<PrivateRoute><ManageCategories /></PrivateRoute>} />
         <Route path="/Admin/Gallery" element={<PrivateRoute><Managegallery /></PrivateRoute>} />
         <Route path="/Admin/Members" element={<PrivateRoute><ManageMembers /></PrivateRoute>} />
+        <Route path="/Admin/Guests" element={<PrivateRoute><ManageGuests /></PrivateRoute>} />
         <Route path="/Admin/:Type/:Id" element={<PrivateRoute><EventForm /></PrivateRoute>} />
         <Route path="/Admin/Edit-Gallery/:Id" element={<PrivateRoute><ManagePhotos /></PrivateRoute>} />
         {/* <Route path="/Admin/Education" element={<PrivateRoute><Edu_management /></PrivateRoute>} /> */}

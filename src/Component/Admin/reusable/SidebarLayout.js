@@ -5,6 +5,7 @@ import {
   Calendar,
   Image,
   Users,
+  UserCheck,
   Menu,
   X,
   Settings as SettingsIcon,
@@ -107,6 +108,14 @@ const SidebarLayout = ({ children }) => {
               icon={<Users />}
               label="Members"
               to="/Admin/Members"
+              collapsed={isCollapsed && !isMobile}
+              isMobile={isMobile}
+              setIsCollapsed={setIsCollapsed}
+            />
+            <SidebarLink
+              icon={<UserCheck />}
+              label="Guests"
+              to="/Admin/Guests"
               collapsed={isCollapsed && !isMobile}
               isMobile={isMobile}
               setIsCollapsed={setIsCollapsed}

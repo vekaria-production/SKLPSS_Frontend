@@ -4,7 +4,7 @@ import { useOptions } from "../../../hooks/useOptions";
 import { getDriveImageUrl } from "./../../../utils/getGoogleDriveImage"
 
 
-const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
+const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest }) => {
   const [errors, setErrors] = useState({});
   // const [positions, setPositions] = useState([]);
   const {
@@ -15,6 +15,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
   } = useOptions();
   // console.log("Positions from useOptions:", position);
   const [preview, setPreview] = useState(null);
+  const [modalIsGuest, setModalIsGuest] = useState(isGuest);
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -115,7 +116,13 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center overflow-auto">
       <div className="bg-white w-full max-w-2xl mx-auto my-10 p-6 rounded-lg shadow-lg overflow-y-auto max-h-[90vh]">
         <h2 className="text-2xl font-semibold mb-4">
-          {mode === "edit" ? "Edit Member" : "Add New Member"}
+          {mode === "edit"
+            ? modalIsGuest
+              ? "Edit Guest"
+              : "Edit Member"
+            : modalIsGuest
+            ? "Add New Guest"
+            : "Add New Member"}
         </h2>
 
         <div className="space-y-4">
@@ -216,21 +223,49 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave }) => {
           </div>
 
           {/* Designation */}
-          <div>
-            <label className="block text-sm font-medium">Designation</label>
-            <select
-              name="Position"
-              value={formData.Position || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2 text-sm"
-            >
-              <option value="">Select Designation</option>
-              {position.map((pos) => (
-                <option key={pos[0]} value={pos[0]}>{pos[1]}</option>
-              ))}
-            </select>
-            {errors.Position && <p className="text-red-500 text-sm">{errors.Position}</p>}
-          </div>
+          {!modalIsGuest ? (
+            <div>
+              <label className="block text-sm font-medium">Designation</label>
+              <select
+                name="Position"
+                value={formData.Position || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2 text-sm"
+              >
+                <option value="">Select Designation</option>
+                {position
+                  .filter((pos) => pos[0] !== 6)
+                  .map((pos) => (
+                    <option key={pos[0]} value={pos[0]}>{pos[1]}</option>
+                  ))}
+              </select>
+              {errors.Position && <p className="text-red-500 text-sm">{errors.Position}</p>}
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium">Designation</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value="Guest"
+                  disabled
+                  className="flex-1 bg-gray-100 border rounded px-3 py-2 text-sm"
+                />
+                {mode === "edit" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModalIsGuest(false);
+                      setFormData((prev) => ({ ...prev, Position: "" }));
+                    }}
+                    className="px-3 py-2 text-sm bg-[#F48F0F] text-white rounded hover:opacity-90 font-medium transition"
+                  >
+                    Convert to Member
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Blood Group */}
           {/* <div>

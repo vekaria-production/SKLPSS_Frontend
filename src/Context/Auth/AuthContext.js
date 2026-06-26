@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
@@ -73,9 +73,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [refreshToken]);
 
+  const hasRefreshed = useRef(false);
+
   useEffect(() => {
     const tryRefreshOnLoad = async () => {
-      if (token) {
+      if (!hasRefreshed.current && token) {
+        hasRefreshed.current = true;
         await refreshAccessToken();
       }
     };

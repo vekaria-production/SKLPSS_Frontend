@@ -5,8 +5,8 @@ import CategoryModal from "./CategoryModal";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import SidebarLayout from "../reusable/SidebarLayout";
 import events from "../../../assets/eventsarray";
-
 import axios from "axios";
+import useDebounce from "../../../hooks/useDebounce";
 
 const ManageCategories = () => {
   const [categoryList, setCategoryList] = useState([]);
@@ -16,6 +16,12 @@ const ManageCategories = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [showDelete, setShowDelete] = useState(false);
   const [refresh, setRefresh] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFiltersRow, setShowFiltersRow] = useState(false);
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 400);
+
   const handleSave = (cat) => {
     
     setCategoryList((prev) => {
@@ -53,38 +59,36 @@ const ManageCategories = () => {
   };
 
   const categoryCols = [
-    { key: "Name", label: "Category" },
+    { key: "Name", label: "Category", filterable: true },
     {
       key: "event_count",
       label: "Events",
     },
   ];
 
-  useEffect(() => {
-
-    async function fetchCategories() {
-      try {
-          const response = await axios.get(`${process.env.REACT_APP_NETWORK}/Categorys`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        let data = response.data;
-        if (typeof data === 'string') {
-          data = JSON.parse(data);
+  async function fetchCategories(nameVal = debouncedSearchTerm) {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_NETWORK}/Categorys`, {
+        params: { name: nameVal || undefined },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-        // // console.log("Fetched API data:", data);
-        // return data;
-        console.log("Fetched Categories:", data);
-        setCategoryList(data);
-      } catch (error) {
-        console.info("Reload");
-        return null;
+      });
+      let data = response.data;
+      if (typeof data === 'string') {
+        data = JSON.parse(data);
       }
-    }  
+      console.log("Fetched Categories:", data);
+      setCategoryList(data);
+    } catch (error) {
+      console.info("Reload");
+      return null;
+    }
+  }
 
-    fetchCategories();
-  }, [refresh]);
+  useEffect(() => {
+    fetchCategories(debouncedSearchTerm);
+  }, [debouncedSearchTerm, refresh]);
   
   return (
     <SidebarLayout>
@@ -145,6 +149,34 @@ const ManageCategories = () => {
               </div>
             ),
           }))}
+          showFiltersRow={showFiltersRow}
+          onToggleFilters={() => setShowFiltersRow(!showFiltersRow)}
+          filterRow={showFiltersRow ? (col) => {
+            if (col.key === "Name") {
+              return (
+                <input
+                  type="text"
+                  placeholder="Filter name..."
+                  className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              );
+            }
+            if (col.key === "actions") {
+              if (searchTerm) {
+                return (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="text-xs text-[#F48F0F] hover:underline font-semibold"
+                  >
+                    Clear
+                  </button>
+                );
+              }
+            }
+            return null;
+          } : null}
         />
 
         {showModal && (
@@ -162,7 +194,7 @@ const ManageCategories = () => {
         {showDelete && (
           <DeleteConfirmation
             title="Delete Category"
-            message={`Delete ${deleteTarget.name}? This action cannot be undone.`}
+            message={`Delete ${deleteTarget.Name}? This action cannot be undone.`}
             onCancel={() => setShowDelete(false)}
             onConfirm={handleDelete}
           />

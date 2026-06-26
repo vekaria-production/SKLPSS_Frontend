@@ -1,6 +1,6 @@
 import React from "react";
 
-const CustomTable = ({ cols, rows, visibleCols = {} }) => {
+const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, onToggleFilters }) => {
   const getVisible = (key) => visibleCols[key] ?? true;
   const visibleColKeys = cols.filter((col) => getVisible(col.key));
 
@@ -16,13 +16,36 @@ const CustomTable = ({ cols, rows, visibleCols = {} }) => {
                   key={i}
                   className="px-4 py-3 text-left whitespace-nowrap w-[200px] bg-[#E1D5C9]"
                 >
-                  {col.label}
+                  <div className="flex items-center gap-1.5">
+                    <span>{col.label}</span>
+                    {col.filterable && onToggleFilters && (
+                      <button
+                        onClick={onToggleFilters}
+                        className="text-[#F48F0F] hover:opacity-80 focus:outline-none text-[10px] transition-all font-semibold ml-1"
+                        title="Toggle Filters"
+                      >
+                        {showFiltersRow ? "▲" : "▼"}
+                      </button>
+                    )}
+                  </div>
                 </th>
               ))}
               <th className="px-4 py-3 text-left whitespace-nowrap w-[150px] bg-[#E1D5C9]">
                 Actions
               </th>
             </tr>
+            {filterRow && (
+              <tr className="bg-[#EDE4DC] border-t border-[#E1D5C9]">
+                {visibleColKeys.map((col, i) => (
+                  <th key={i} className="px-4 py-2 w-[200px] bg-[#EDE4DC] font-normal">
+                    {filterRow(col)}
+                  </th>
+                ))}
+                <th className="px-4 py-2 w-[150px] bg-[#EDE4DC] text-left font-normal">
+                  {filterRow({ key: "actions" })}
+                </th>
+              </tr>
+            )}
           </thead>
 
           {/* Table Body */}

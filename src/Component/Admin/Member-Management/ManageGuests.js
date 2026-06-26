@@ -8,11 +8,12 @@ import axios from "axios";
 import { useOptions } from "../../../hooks/useOptions";
 import useDebounce from "../../../hooks/useDebounce";
 
-const ManageMembers = () => {
+const ManageGuests = () => {
   const [members, setMembers] = useState([]);
   const [formData, setFormData] = useState(null);
   const [mode, setMode] = useState(""); 
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [modalIsGuest, setModalIsGuest] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [contactFilter, setContactFilter] = useState("");
@@ -24,12 +25,12 @@ const ManageMembers = () => {
     Gender: false,
     Contact: true,
     Email: true,
-    Position: true,
+    Position: false,
   });
 
   const [showSettings, setShowSettings] = useState(false);
   const [showFiltersRow, setShowFiltersRow] = useState(false);
-  const [filters, setFilters] = useState({ Position: "", Gender: "" });
+  const [filters, setFilters] = useState({ Gender: "" });
 
   const settingsRef = useRef();
 
@@ -53,7 +54,6 @@ const ManageMembers = () => {
 
   const { position = [] } = useOptions();
 
-  const designationOptions = position.filter((p) => p[0] !== 6).map((p) => p[0]);
   const genderOptions = ["M", "F"];
 
   const getPositionName = (id) => {
@@ -76,6 +76,7 @@ const ManageMembers = () => {
   };
 
   const handleAddClick = () => {
+    setModalIsGuest(true);
     setMode("add");
     setFormData({
       membership_id: generateNewId(),
@@ -85,13 +86,20 @@ const ManageMembers = () => {
       Gender: "M",
       Contact: "",
       Email: "",
-      Position: "",
+      Position: 6, // Fixed to Guest position ID
     });
   };
 
   const handleEditClick = (member) => {
+    setModalIsGuest(true);
     setMode("edit");
     setFormData({ ...member });
+  };
+
+  const handleConvertClick = (member) => {
+    setModalIsGuest(false);
+    setMode("edit");
+    setFormData({ ...member, Position: "" });
   };
 
   const handleCancelForm = () => {
@@ -123,15 +131,13 @@ const ManageMembers = () => {
         }
       );
 
-      // Update frontend state only if backend deletion succeeds
       setMembers((prev) => prev.filter((m) => m.Id !== id));
       setDeleteTarget(null);
     } catch (error) {
-      console.error("Error deleting member:", error);
-      alert("Failed to delete member. Please try again.");
+      console.error("Error deleting guest:", error);
+      alert("Failed to delete guest. Please try again.");
     }
   };
-
 
   useEffect(() => {
     async function fetchMembers() {
@@ -139,11 +145,10 @@ const ManageMembers = () => {
         const response = await axios.get(`${process.env.REACT_APP_NETWORK}/getMemberList`, {
           params: {
             limit: 10000,
-            excludePosition: 6,
+            position: 6, // Fixed to only query Guests
             name: debouncedSearchTerm || undefined,
             contact: debouncedContactFilter || undefined,
             email: debouncedEmailFilter || undefined,
-            position: filters.Position || undefined,
             gender: filters.Gender || undefined,
           },
           headers: {
@@ -156,22 +161,22 @@ const ManageMembers = () => {
         }
         setMembers(data);
       } catch (error) {
-        console.error("Error fetching members:", error);
+        console.error("Error fetching guests:", error);
       }
     }
     fetchMembers();
-  }, [debouncedSearchTerm, debouncedContactFilter, debouncedEmailFilter, filters.Position, filters.Gender]);
+  }, [debouncedSearchTerm, debouncedContactFilter, debouncedEmailFilter, filters.Gender]);
 
   return (
     <SidebarLayout>
       <div className="w-full bg-[#FDF8F3] p-2 pb-0 min-h-[550px]">
-        <div className="flex justify-between items-center mb-6 ">
-          <h1 className="text-2xl font-semibold">Member Management</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold">Guest Management</h1>
           <button
             onClick={handleAddClick}
             className="bg-[#F48F0F] text-white md:px-4 px-2 py-1 md:py-2 rounded-xl hover:opacity-90"
           >
-            Add New Member
+            Add New Guest
           </button>
         </div>
 
@@ -233,7 +238,6 @@ const ManageMembers = () => {
         </div>
 
         {/* Table */}
-        
         <CustomTable
           cols={[
             { key: "Id", label: "ID" },
@@ -244,22 +248,27 @@ const ManageMembers = () => {
             { key: "Email", label: "Email", filterable: true },
             { key: "Position", label: "Designation", filterable: true },
           ]}
-
           rows={filteredMembers.map((m) => ({
             ...m,
             Gender: m.Gender === "M" ? "Male" : m.Gender === "F" ? "Female" : "Other",
             Position: getPositionName(m.Position),
             actions: (
-              <>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleConvertClick(m)}
+                  className="bg-[#F48F0F]/10 text-[#F48F0F] border border-[#F48F0F] px-2 py-0.5 rounded hover:bg-[#F48F0F] hover:text-white transition text-xs font-semibold"
+                >
+                  Convert
+                </button>
                 <FaEdit
-                  className="text-[#F48F0F] cursor-pointer mr-2"
+                  className="text-[#F48F0F] cursor-pointer"
                   onClick={() => handleEditClick(m)}
                 />
                 <FaTrash
                   className="text-[#F48F0F] cursor-pointer"
                   onClick={() => setDeleteTarget(m)}
                 />
-              </>
+              </div>
             ),
           }))}
           visibleCols={visibleColumns}
@@ -317,30 +326,12 @@ const ManageMembers = () => {
                 />
               );
             }
-            if (col.key === "Position") {
-              return (
-                <select
-                  className="w-full border border-gray-300 rounded px-2 py-1 text-xs font-normal bg-white"
-                  value={filters.Position}
-                  onChange={(e) =>
-                    setFilters({ ...filters, Position: e.target.value })
-                  }
-                >
-                  <option value="">All</option>
-                  {designationOptions.map((d, i) => (
-                    <option key={i} value={d}>
-                      {getPositionName(d)}
-                    </option>
-                  ))}
-                </select>
-              );
-            }
             if (col.key === "actions") {
-              if (filters.Position || filters.Gender || searchTerm || contactFilter || emailFilter) {
+              if (filters.Gender || searchTerm || contactFilter || emailFilter) {
                 return (
                   <button
                     onClick={() => {
-                      setFilters({ Position: "", Gender: "" });
+                      setFilters({ Gender: "" });
                       setSearchTerm("");
                       setContactFilter("");
                       setEmailFilter("");
@@ -364,7 +355,7 @@ const ManageMembers = () => {
             setFormData={setFormData}
             onCancel={handleCancelForm}
             onSave={handleSaveForm}
-            isGuest={false}
+            isGuest={modalIsGuest}
           />
         )}
 
@@ -373,7 +364,7 @@ const ManageMembers = () => {
           <DeleteConfirmation
             onCancel={() => setDeleteTarget(null)}
             onConfirm={() => handleDelete(deleteTarget.Id)}
-            title="Delete Member"
+            title="Delete Guest"
             message={`Are you sure you want to delete ${deleteTarget.Fname} ${deleteTarget.LName || ""}?`}
           />
         )}
@@ -382,4 +373,4 @@ const ManageMembers = () => {
   );
 };
 
-export default ManageMembers;
+export default ManageGuests;
