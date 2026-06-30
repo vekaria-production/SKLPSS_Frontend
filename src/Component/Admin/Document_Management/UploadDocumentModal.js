@@ -1,24 +1,42 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FaCloudUploadAlt, FaFileAlt, FaTimes, FaSpinner } from "react-icons/fa";
 
-const UploadDocumentModal = ({ existingTypes = [], onClose, onUploaded }) => {
+const UploadDocumentModal = ({ onClose, onUploaded }) => {
   const [files, setFiles] = useState([]);
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   
-  // Custom Type Options State
-  const [typeOptions, setTypeOptions] = useState(() => {
-    const defaults = ["Circular", "Minutes", "Accounts", "Report"];
-    const merged = new Set([...defaults, ...existingTypes]);
-    return Array.from(merged);
-  });
+  // Custom Type Options State (loaded dynamically from database)
+  const [typeOptions, setTypeOptions] = useState([]);
   const [showAddType, setShowAddType] = useState(false);
   const [newTypeVal, setNewTypeVal] = useState("");
 
   const fileInputRef = useRef(null);
+
+  // Fetch document types on component load
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_NETWORK}/document-types`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setTypeOptions(res.data.map((t) => t.name));
+      } catch (err) {
+        console.error("Failed to fetch document types from database", err);
+        // Fallback options
+        setTypeOptions(["Circular", "Minutes", "Accounts", "Report"]);
+      }
+    };
+    fetchTypes();
+  }, []);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -57,15 +75,33 @@ const UploadDocumentModal = ({ existingTypes = [], onClose, onUploaded }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const handleAddNewType = () => {
+  const handleAddNewType = async () => {
     const trimmed = newTypeVal.trim();
     if (!trimmed) return alert("Please enter a valid type name");
-    if (!typeOptions.includes(trimmed)) {
-      setTypeOptions((prev) => [...prev, trimmed]);
+
+    setUploading(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_NETWORK}/document-types`,
+        { name: trimmed },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (!typeOptions.includes(trimmed)) {
+        setTypeOptions((prev) => [...prev, trimmed]);
+      }
+      setCategory(trimmed);
+      setNewTypeVal("");
+      setShowAddType(false);
+    } catch (err) {
+      console.error("Failed to add type to DB", err);
+      alert(err.response?.data?.detail || "Failed to register new document type in database");
+    } finally {
+      setUploading(false);
     }
-    setCategory(trimmed);
-    setNewTypeVal("");
-    setShowAddType(false);
   };
 
   const handleUpload = async () => {
