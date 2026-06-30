@@ -422,17 +422,23 @@ const ManageEvents = () => {
 
                 {event.Status == "ongoing" ?
                   <TicketCheck
-                    className="text-[#F48F0F] cursor-pointer ml-4"
+                    size={18}
+                    className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer ml-3 transition-colors inline-block"
                     onClick={() =>
                       navigate("/Admin/Event-Registration", { state: { event } })
                     }
+                    title="Event Check-In"
                   /> :
                   event.Status == "completed" ?
                     <CircleCheckBig
-                      className="text-green-400 cursor-not-allowed ml-4"
+                      size={18}
+                      className="text-green-500 cursor-not-allowed ml-3 inline-block"
+                      title="Event Completed"
                     /> :
                     <Clock
-                      className="text-gray-400 cursor-not-allowed ml-4"
+                      size={18}
+                      className="text-gray-400 cursor-not-allowed ml-3 inline-block"
+                      title="Event Scheduled"
                     />
                 }
 
