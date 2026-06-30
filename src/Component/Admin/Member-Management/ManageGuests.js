@@ -87,6 +87,7 @@ const ManageGuests = () => {
       Contact: "",
       Email: "",
       Position: 6, // Fixed to Guest position ID
+      BloodGroup: "",
     });
   };
 

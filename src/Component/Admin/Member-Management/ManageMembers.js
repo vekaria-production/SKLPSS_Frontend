@@ -88,6 +88,7 @@ const ManageMembers = () => {
       Contact: "",
       Email: "",
       Position: "",
+      BloodGroup: "",
     });
   };
 

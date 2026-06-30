@@ -268,7 +268,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
           )}
 
           {/* Blood Group */}
-          {/* <div>
+          <div>
             <label className="block text-sm font-medium">Blood Group</label>
             <select
               name="BloodGroup"
@@ -281,7 +281,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
                 <option key={bg} value={bg}>{bg}</option>
               ))}
             </select>
-          </div> */}
+          </div>
 
           {/* Image Upload */}
           <div>

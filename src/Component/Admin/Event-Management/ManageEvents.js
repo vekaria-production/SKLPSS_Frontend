@@ -334,7 +334,6 @@ const ManageEvents = () => {
           </div>
         </div>
 
-        {/* Event Table */}
         <CustomTable
           cols={[
             { key: "Name", label: "Event Name", filterable: true },
@@ -343,6 +342,7 @@ const ManageEvents = () => {
             { key: "Category", label: "Category", filterable: true },
             { key: "Status", label: "Status", filterable: true },
           ]}
+          actionsWidth="w-[200px]"
           rows={filteredEvents.map((event) => ({
             ...event,
             actions: (
@@ -357,19 +357,19 @@ const ManageEvents = () => {
                 />
                 <FaTrash
                   size={18}
-                  className="text-red-500 hover:text-red-600 cursor-pointer ml-3 transition-colors"
+                  className="text-red-500 hover:text-red-600 cursor-pointer transition-colors"
                   onClick={() => confirmDelete(event.ID)}
                   title="Delete Event"
                 />
                 <Users
                   size={18}
-                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer ml-3 transition-colors inline-block"
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
                   onClick={() => showUser(event.ID)}
                   title="Show Registered Users"
                 />
                 <FaLink
                   size={18}
-                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer ml-3 transition-colors"
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
                   onClick={() => setShareEventId(event.ID)}
                   title="Generate shareable image upload link"
                 />
@@ -423,7 +423,7 @@ const ManageEvents = () => {
                 {event.Status == "ongoing" ?
                   <TicketCheck
                     size={18}
-                    className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer ml-3 transition-colors inline-block"
+                    className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
                     onClick={() =>
                       navigate("/Admin/Event-Registration", { state: { event } })
                     }
@@ -432,12 +432,12 @@ const ManageEvents = () => {
                   event.Status == "completed" ?
                     <CircleCheckBig
                       size={18}
-                      className="text-green-500 cursor-not-allowed ml-3 inline-block"
+                      className="text-green-500 cursor-not-allowed"
                       title="Event Completed"
                     /> :
                     <Clock
                       size={18}
-                      className="text-gray-400 cursor-not-allowed ml-3 inline-block"
+                      className="text-gray-400 cursor-not-allowed"
                       title="Event Scheduled"
                     />
                 }

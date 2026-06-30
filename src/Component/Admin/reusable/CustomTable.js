@@ -1,6 +1,6 @@
 import React from "react";
 
-const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, onToggleFilters }) => {
+const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, onToggleFilters, actionsWidth = "w-[150px]" }) => {
   const getVisible = (key) => visibleCols[key] ?? true;
   const visibleColKeys = cols.filter((col) => getVisible(col.key));
 
@@ -30,7 +30,7 @@ const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, 
                   </div>
                 </th>
               ))}
-              <th className="px-4 py-3 text-left whitespace-nowrap w-[150px] bg-[#E1D5C9]">
+              <th className={`px-4 py-3 text-left whitespace-nowrap bg-[#E1D5C9] ${actionsWidth}`}>
                 Actions
               </th>
             </tr>
@@ -41,7 +41,7 @@ const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, 
                     {filterRow(col)}
                   </th>
                 ))}
-                <th className="px-4 py-2 w-[150px] bg-[#EDE4DC] text-left font-normal">
+                <th className={`px-4 py-2 bg-[#EDE4DC] text-left font-normal ${actionsWidth}`}>
                   {filterRow({ key: "actions" })}
                 </th>
               </tr>
@@ -68,8 +68,8 @@ const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, 
                       : row[col.key]}
                   </td>
                 ))}
-                <td className="px-4 py-3 whitespace-nowrap w-[150px]">
-                  <div className="flex gap-3">
+                <td className={`px-4 py-3 whitespace-nowrap ${actionsWidth}`}>
+                  <div className="flex gap-3 [&>svg]:shrink-0">
                     {row.actions || <span className="text-gray-400">—</span>}
                   </div>
                 </td>
