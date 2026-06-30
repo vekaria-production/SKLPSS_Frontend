@@ -294,7 +294,9 @@ export default function QrScanner() {
                             <FaCheckCircle className="text-2xl" />
                             <span>ACCESS GRANTED</span>
                           </div>
-                          <p className="text-xs text-green-600 font-semibold mb-4">Verification succeeded. Welcome to the event!</p>
+                          <p className="text-xs text-green-600 font-semibold mb-4">
+                            {result.message || "Verification succeeded. Welcome to the event!"}
+                          </p>
                           
                           <div className="space-y-2.5 text-xs text-gray-600 border-t border-green-200/50 pt-3">
                             <div className="flex justify-between">
@@ -316,7 +318,9 @@ export default function QrScanner() {
                             <FaExclamationTriangle className="text-2xl" />
                             <span>ALREADY CHECKED IN</span>
                           </div>
-                          <p className="text-xs text-amber-600 font-semibold mb-4">This ticket has already been used for entry.</p>
+                          <p className="text-xs text-amber-600 font-semibold mb-4">
+                            {result.message ? `${result.message} (Already Checked In)` : "This ticket has already been used for entry."}
+                          </p>
                           
                           <div className="space-y-2.5 text-xs text-gray-600 border-t border-amber-200/50 pt-3">
                             <div className="flex justify-between">
@@ -339,7 +343,7 @@ export default function QrScanner() {
                             <span>INVALID TICKET</span>
                           </div>
                           <p className="text-xs text-red-600 font-semibold mb-1 leading-relaxed">
-                            No active registration record found matching this QR token signature. Access denied.
+                            {result.message || "No active registration record found matching this QR token signature. Access denied."}
                           </p>
                         </div>
                       )}
