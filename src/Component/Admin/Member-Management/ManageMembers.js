@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { FaSearch, FaEdit, FaTrash, FaFilter, FaCog } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaFilter, FaCog, FaIdCard, FaPrint } from "react-icons/fa";
 import SidebarLayout from "../reusable/SidebarLayout";
 import CustomTable from "../reusable/CustomTable";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
@@ -7,12 +7,14 @@ import MemberModal from "../Member-Management/MemberModal";
 import axios from "axios";
 import { useOptions } from "../../../hooks/useOptions";
 import useDebounce from "../../../hooks/useDebounce";
+import { QRCodeSVG } from "qrcode.react";
 
 const ManageMembers = () => {
   const [members, setMembers] = useState([]);
   const [formData, setFormData] = useState(null);
   const [mode, setMode] = useState(""); 
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [selectedCardMember, setSelectedCardMember] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [contactFilter, setContactFilter] = useState("");
@@ -251,6 +253,11 @@ const ManageMembers = () => {
             Position: getPositionName(m.Position),
             actions: (
               <>
+                <FaIdCard
+                  className="text-[#F48F0F] cursor-pointer mr-2"
+                  title="Generate ID Card"
+                  onClick={() => setSelectedCardMember(m)}
+                />
                 <FaEdit
                   className="text-[#F48F0F] cursor-pointer mr-2"
                   onClick={() => handleEditClick(m)}
@@ -376,6 +383,121 @@ const ManageMembers = () => {
             title="Delete Member"
             message={`Are you sure you want to delete ${deleteTarget.Fname} ${deleteTarget.LName || ""}?`}
           />
+        )}
+
+        {/* ID Card Modal */}
+        {selectedCardMember && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
+            <style>{`
+              @media print {
+                body * {
+                  visibility: hidden !important;
+                }
+                .print-card-container,
+                .print-card-container * {
+                  visibility: visible !important;
+                }
+                .print-card-container {
+                  position: absolute !important;
+                  left: 50% !important;
+                  top: 50% !important;
+                  transform: translate(-50%, -50%) !important;
+                  box-shadow: none !important;
+                  border: 1px solid #F48F0F !important;
+                  background: #FFFDF9 !important;
+                }
+              }
+            `}</style>
+            
+            <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border border-gray-100 flex flex-col items-center">
+              {/* ID Card Render Area */}
+              <div className="print-card-container w-[320px] h-[480px] bg-gradient-to-b from-[#FFFDF9] to-[#FDF4E7] border-2 border-[#F48F0F]/30 rounded-3xl shadow-xl flex flex-col items-center p-5 relative overflow-hidden">
+                {/* Background accents */}
+                <div className="absolute top-[-50px] right-[-50px] w-36 h-36 bg-[#F48F0F]/5 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute bottom-[-50px] left-[-50px] w-36 h-36 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
+                
+                {/* Header */}
+                <div className="w-full flex flex-col items-center border-b border-[#F48F0F]/15 pb-3.5 mb-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-[#F48F0F] to-amber-500 flex items-center justify-center text-[8px] text-white font-extrabold">S</span>
+                    <span className="text-sm font-extrabold tracking-wider text-gray-800 uppercase">SKLPSS</span>
+                  </div>
+                  <span className="text-[9px] font-bold text-[#F48F0F]/80 uppercase tracking-[0.15em] mt-0.5">Official Identity Card</span>
+                </div>
+
+                {/* Profile Photo */}
+                <div className="relative mb-3">
+                  {selectedCardMember.Image ? (
+                    <img
+                      src={selectedCardMember.Image}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover shadow-md ring-4 ring-[#F48F0F]/20"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#F48F0F] to-amber-500 text-white flex items-center justify-center text-3xl font-extrabold shadow-md ring-4 ring-[#F48F0F]/20 uppercase">
+                      {selectedCardMember.Fname[0]}{selectedCardMember.LName ? selectedCardMember.LName[0] : ""}
+                    </div>
+                  )}
+                  <div className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 bg-[#F48F0F] text-white text-[8px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                    MEMBER
+                  </div>
+                </div>
+
+                {/* Name and Designation */}
+                <div className="text-center w-full mb-3">
+                  <h2 className="text-lg font-extrabold text-gray-800 leading-tight tracking-wide uppercase">
+                    {selectedCardMember.Fname} {selectedCardMember.LName || ""}
+                  </h2>
+                  <div className="inline-block bg-[#F48F0F]/10 text-[#F48F0F] font-extrabold text-[10px] px-3 py-0.5 rounded-full mt-1.5 uppercase tracking-wider">
+                    {getPositionName(selectedCardMember.Position)}
+                  </div>
+                </div>
+
+                {/* Dynamic QR Code */}
+                <div className="mb-4">
+                  <QRCodeSVG
+                    value={selectedCardMember.Id.toString()}
+                    size={110}
+                    level="H"
+                    includeMargin={true}
+                    className="p-2 bg-white border border-[#F48F0F]/10 rounded-2xl shadow-sm"
+                  />
+                </div>
+
+                {/* Detail Info Grid */}
+                <div className="w-full grid grid-cols-2 gap-y-2 gap-x-4 text-[10px] text-gray-600 bg-white/50 backdrop-blur-sm p-3 rounded-2xl border border-gray-100/50 mt-auto">
+                  <div>
+                    <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-wider">Member ID</span>
+                    <span className="font-extrabold text-gray-800">#{selectedCardMember.Id}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-wider">Blood Group</span>
+                    <span className="font-extrabold text-gray-800">{selectedCardMember.BloodGroup || "N/A"}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-wider">Mobile</span>
+                    <span className="font-extrabold text-gray-800">{selectedCardMember.Contact || "N/A"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex gap-3 w-full">
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 bg-[#F48F0F] hover:bg-[#F48F0F]/90 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#F48F0F]/15 transition-all text-sm cursor-pointer"
+                >
+                  <FaPrint /> Print Card
+                </button>
+                <button
+                  onClick={() => setSelectedCardMember(null)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 px-4 rounded-xl transition-all text-sm cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </SidebarLayout>
