@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 // Define modules + actions once
-const modules = ["events", "gallery", "members", "category", "setting", "dashboard"];
+const modules = ["events", "gallery", "members", "category", "setting", "dashboard", "meetings", "documents", "registration"];
 const actions = ["view", "add", "edit", "delete"];
 
 const AddRoleModal = ({ role, onClose, onSave }) => {
@@ -57,7 +57,7 @@ const AddRoleModal = ({ role, onClose, onSave }) => {
     <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-xl space-y-6">
         <h3 className="text-lg font-bold text-[#292929]">
-          {role ? "Edit Role Type" : "Add Role Type"}
+          {role ? "Edit Role" : "Add Role"}
         </h3>
 
         <input

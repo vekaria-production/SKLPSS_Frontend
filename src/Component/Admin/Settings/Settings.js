@@ -277,7 +277,7 @@ const Settings = () => {
               className="flex items-center gap-1 px-4 py-2 border border-[#F48F0F] text-[#F48F0F] bg-white hover:bg-[#fff4e0] rounded-lg text-sm shadow-sm"
               onClick={() => setShowRoleModal(true)}
             >
-              <Plus size={16} /> Add Type
+              <Plus size={16} /> Add Role
             </button>
             <button
               className="flex items-center gap-1 px-4 py-2 bg-[#F48F0F] text-white hover:bg-[#dc7d00] rounded-lg text-sm shadow-sm"
