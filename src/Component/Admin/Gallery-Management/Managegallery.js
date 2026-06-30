@@ -239,15 +239,12 @@ const ManageEvents = () => {
             actions: (
               <>
                 <FaEdit
-                  className="text-[#F48F0F] cursor-pointer"
+                  size={18}
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
                   onClick={() =>
                     navigate(`/Admin/Edit-Gallery/${event.ID}`, { state: { event } })
                   }
                 />
-                {/* <FaTrash
-                  className="text-[#F48F0F] cursor-pointer ml-4"
-                  onClick={() => confirmDelete(event.ID)}
-                /> */}
               </>
             ),
           }))}

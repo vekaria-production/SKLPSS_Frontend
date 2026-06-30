@@ -303,22 +303,24 @@ const Settings = () => {
                 ) : (
                   <>
                     <button
-                      className="text-[#F48F0F] flex items-center text-sm"
+                      className="text-[#F48F0F] hover:text-[#dc7d00] transition-colors p-1"
+                      title="Edit Role"
                       onClick={() => {
                         setSelectedRole(role);
                         setShowRoleModal(true);
                       }}
                     >
-                      <Pencil size={14} className="mr-1" />
+                      <Pencil size={18} />
                     </button>
                     <button
-                      className="text-red-500 flex items-center text-sm"
+                      className="text-red-500 hover:text-red-600 transition-colors p-1 ml-2"
+                      title="Delete Role"
                       onClick={() => {
                         setItemToDelete(role);
                         setShowDeleteModal(true);
                       }}
                     >
-                      <Trash2 size={14} className="mr-1" />
+                      <Trash2 size={18} />
                     </button>
                   </>
                 ),
@@ -364,22 +366,24 @@ const Settings = () => {
               actions: (
                 <>
                   <button
-                    className="text-[#F48F0F] hover:underline flex items-center text-sm"
+                    className="text-[#F48F0F] hover:text-[#dc7d00] transition-colors p-1"
+                    title="Edit User"
                     onClick={() => {
                       setSelectedUser(user);
                       setShowEditUserModal(true);
                     }}
                   >
-                    <Pencil size={14} className="mr-1" />
+                    <Pencil size={18} />
                   </button>
                   <button
-                    className="text-red-500 hover:underline flex items-center text-sm"
+                    className="text-red-500 hover:text-red-600 transition-colors p-1 ml-2"
+                    title="Delete User"
                     onClick={() => {
                       setItemToDelete(user);
                       setShowDeleteModal(true);
                     }}
                   >
-                    <Trash2 size={14} className="mr-1" />
+                    <Trash2 size={18} />
                   </button>
                 </>
               ),

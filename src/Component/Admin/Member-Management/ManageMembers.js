@@ -254,16 +254,19 @@ const ManageMembers = () => {
             actions: (
               <>
                 <FaIdCard
-                  className="text-[#F48F0F] cursor-pointer mr-2"
+                  size={18}
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer mr-3 transition-colors"
                   title="Generate ID Card"
                   onClick={() => setSelectedCardMember(m)}
                 />
                 <FaEdit
-                  className="text-[#F48F0F] cursor-pointer mr-2"
+                  size={18}
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer mr-3 transition-colors"
                   onClick={() => handleEditClick(m)}
                 />
                 <FaTrash
-                  className="text-[#F48F0F] cursor-pointer"
+                  size={18}
+                  className="text-red-500 hover:text-red-600 cursor-pointer transition-colors"
                   onClick={() => setDeleteTarget(m)}
                 />
               </>

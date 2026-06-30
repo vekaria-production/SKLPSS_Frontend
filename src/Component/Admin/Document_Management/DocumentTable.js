@@ -31,11 +31,13 @@ const DocumentTable = ({
         actions: (
           <>
             <FaDownload
-              className="icon-action mr-3"
+              size={18}
+              className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer mr-3 transition-colors"
               onClick={() => window.open(doc.DocumentLink, "_blank")}
             />
             <FaTrash
-              className="icon-action"
+              size={18}
+              className="text-red-500 hover:text-red-600 cursor-pointer transition-colors"
               onClick={() => onDelete(doc)}
             />
           </>
