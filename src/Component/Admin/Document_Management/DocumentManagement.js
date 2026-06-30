@@ -94,6 +94,7 @@ const DocumentManagement = () => {
         {/* Upload */}
         {showUpload && (
           <UploadDocumentModal
+            existingTypes={[...new Set(documents.map((d) => d.Category).filter(Boolean))]}
             onClose={() => setShowUpload(false)}
             onUploaded={() => fetchDocuments(debouncedSearchTerm, filters)}
           />

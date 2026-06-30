@@ -19,7 +19,7 @@ const DocumentTable = ({
     <CustomTable
       cols={[
         { key: "DocumentName", label: "Document Name", filterable: true },
-        { key: "Category", label: "Category", filterable: true },
+        { key: "Category", label: "Type", filterable: true },
         // { key: "UploadedBy", label: "Uploaded By (ID)" },
         { key: "Status", label: "Status", filterable: true },
         { key: "CreatedAt", label: "Uploaded On" },
@@ -66,7 +66,7 @@ const DocumentTable = ({
                 setFilters({ ...filters, category: e.target.value })
               }
             >
-              <option value="">All</option>
+              <option value="">All Types</option>
               {categoryOptions.map((c, i) => (
                 <option key={i} value={c}>
                   {c}

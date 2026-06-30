@@ -16,7 +16,7 @@ const DocumentFilters = ({ filters, setFilters, onClose }) => {
 
         <input
           type="text"
-          placeholder="Category"
+          placeholder="Type"
           className="border border-gray-300 rounded px-2 py-1 text-sm"
           value={filters.category}
           onChange={(e) =>

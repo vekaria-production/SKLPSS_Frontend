@@ -2,12 +2,22 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { FaCloudUploadAlt, FaFileAlt, FaTimes, FaSpinner } from "react-icons/fa";
 
-const UploadDocumentModal = ({ onClose, onUploaded }) => {
+const UploadDocumentModal = ({ existingTypes = [], onClose, onUploaded }) => {
   const [files, setFiles] = useState([]);
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  // Custom Type Options State
+  const [typeOptions, setTypeOptions] = useState(() => {
+    const defaults = ["Circular", "Minutes", "Accounts", "Report"];
+    const merged = new Set([...defaults, ...existingTypes]);
+    return Array.from(merged);
+  });
+  const [showAddType, setShowAddType] = useState(false);
+  const [newTypeVal, setNewTypeVal] = useState("");
+
   const fileInputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -47,9 +57,20 @@ const UploadDocumentModal = ({ onClose, onUploaded }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const handleAddNewType = () => {
+    const trimmed = newTypeVal.trim();
+    if (!trimmed) return alert("Please enter a valid type name");
+    if (!typeOptions.includes(trimmed)) {
+      setTypeOptions((prev) => [...prev, trimmed]);
+    }
+    setCategory(trimmed);
+    setNewTypeVal("");
+    setShowAddType(false);
+  };
+
   const handleUpload = async () => {
     if (!files.length) return alert("Please select or drop at least one file");
-    if (!category.trim()) return alert("Please specify a category");
+    if (!category.trim()) return alert("Please select or specify a type");
 
     setUploading(true);
     const formData = new FormData();
@@ -151,15 +172,52 @@ const UploadDocumentModal = ({ onClose, onUploaded }) => {
           {/* Form Fields */}
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Category</label>
-              <input
-                type="text"
-                placeholder="e.g. Minutes, Circular, Accounts"
-                className="border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#F48F0F]/20 focus:border-[#F48F0F] rounded-xl px-3 py-2 w-full text-sm transition-all"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                disabled={uploading}
-              />
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Type</label>
+                <button
+                  type="button"
+                  onClick={() => setShowAddType((prev) => !prev)}
+                  className="text-xs text-[#F48F0F] hover:underline font-semibold"
+                  disabled={uploading}
+                >
+                  {showAddType ? "Cancel" : "+ Add Type"}
+                </button>
+              </div>
+
+              {showAddType ? (
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Enter new type..."
+                    className="border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#F48F0F]/20 focus:border-[#F48F0F] rounded-xl px-3 py-2 flex-1 text-sm transition-all"
+                    value={newTypeVal}
+                    onChange={(e) => setNewTypeVal(e.target.value)}
+                    disabled={uploading}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNewType}
+                    className="bg-[#F48F0F] hover:bg-[#F48F0F]/90 text-white px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                    disabled={uploading}
+                  >
+                    Add
+                  </button>
+                </div>
+              ) : (
+                <select
+                  className="border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#F48F0F]/20 focus:border-[#F48F0F] rounded-xl px-3 py-2 w-full text-sm transition-all bg-white"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  disabled={uploading}
+                >
+                  <option value="">Select Type</option>
+                  {typeOptions.map((t, idx) => (
+                    <option key={idx} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div>

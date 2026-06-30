@@ -348,22 +348,28 @@ const ManageEvents = () => {
             actions: (
               <>
                 <FaEdit
-                  className="text-[#F48F0F] cursor-pointer"
+                  size={18}
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
                   onClick={() =>
                     navigate(`/Admin/Edit-Event/${event.ID}`, { state: { event } })
                   }
+                  title="Edit Event"
                 />
                 <FaTrash
-                  className="text-[#F48F0F] cursor-pointer ml-4"
+                  size={18}
+                  className="text-red-500 hover:text-red-600 cursor-pointer ml-3 transition-colors"
                   onClick={() => confirmDelete(event.ID)}
+                  title="Delete Event"
                 />
                 <Users
-                  className="text-[#F48F0F] cursor-pointer ml-4"
+                  size={18}
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer ml-3 transition-colors inline-block"
                   onClick={() => showUser(event.ID)}
                   title="Show Registered Users"
                 />
                 <FaLink
-                  className="text-[#F48F0F] cursor-pointer ml-4"
+                  size={18}
+                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer ml-3 transition-colors"
                   onClick={() => setShareEventId(event.ID)}
                   title="Generate shareable image upload link"
                 />
