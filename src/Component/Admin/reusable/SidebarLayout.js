@@ -20,7 +20,7 @@ import { useAuth } from "../../../Context/Auth/AuthContext";
 const currentUser = { id: 1, name: "Yagnik", role: "admin" }; // Replace with auth context later
 
 const SidebarLayout = ({ children }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(window.innerWidth <= 640);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
 
   const { permissions } = useAuth();
@@ -29,7 +29,9 @@ const SidebarLayout = ({ children }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 640);
+      const mobile = window.innerWidth <= 640;
+      setIsMobile(mobile);
+      setIsCollapsed(mobile);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -57,11 +59,11 @@ const SidebarLayout = ({ children }) => {
             transition-all duration-300 ease-in-out
             ${isMobile
               ? isCollapsed
-                ? "-translate-x-full w-64"
-                : "translate-x-0 w-64"
+                ? "-translate-x-full w-52"
+                : "translate-x-0 w-52"
               : isCollapsed
                 ? "w-16"
-                : "w-64"
+                : "w-52"
             }
             flex flex-col
           `}

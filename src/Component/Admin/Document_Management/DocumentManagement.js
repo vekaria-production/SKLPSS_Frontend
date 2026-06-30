@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SidebarLayout from "../reusable/SidebarLayout";
 import axios from "axios";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter, FaPlus } from "react-icons/fa";
 import DocumentTable from "./DocumentTable";
 import DocumentFilters from "./DocumentFilters";
 import UploadDocumentModal from "./UploadDocumentModal";
@@ -76,8 +76,11 @@ const DocumentManagement = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Document Management</h1>
-          <button className="btn-primary" onClick={() => setShowUpload(true)}>
-            Upload Documents
+          <button 
+            className="bg-[#F48F0F] text-white px-4 py-2.5 rounded-xl hover:opacity-90 text-sm font-semibold flex items-center shadow-md shadow-[#F48F0F]/15 transition-all cursor-pointer" 
+            onClick={() => setShowUpload(true)}
+          >
+            <FaPlus className="mr-2" /> Upload Document
           </button>
         </div>
 

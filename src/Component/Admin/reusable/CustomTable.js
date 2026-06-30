@@ -1,6 +1,6 @@
 import React from "react";
 
-const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, onToggleFilters, actionsWidth = "w-[150px]" }) => {
+const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, onToggleFilters, actionsWidth = "w-[150px]", onRowClick }) => {
   const getVisible = (key) => visibleCols[key] ?? true;
   const visibleColKeys = cols.filter((col) => getVisible(col.key));
 
@@ -53,9 +53,21 @@ const CustomTable = ({ cols, rows, visibleCols = {}, filterRow, showFiltersRow, 
             {rows.map((row, rIndex) => (
               <tr
                 key={rIndex}
+                onClick={(e) => {
+                  if (
+                    e.target.closest("button") ||
+                    e.target.closest("a") ||
+                    e.target.closest("input") ||
+                    e.target.closest("select") ||
+                    e.target.closest(".icon-action")
+                  ) {
+                    return;
+                  }
+                  if (onRowClick) onRowClick(row);
+                }}
                 className={`${
                   rIndex % 2 === 0 ? "bg-white" : "bg-[#F5EFEB]"
-                } text-[#292929] text-sm`}
+                } text-[#292929] text-sm ${onRowClick ? "cursor-pointer hover:bg-orange-50/40 transition-colors" : ""}`}
               >
                 {visibleColKeys.map((col, cIndex) => (
                   <td

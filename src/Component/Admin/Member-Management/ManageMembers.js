@@ -426,7 +426,7 @@ const ManageMembers = () => {
                     <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-[#F48F0F] to-amber-500 flex items-center justify-center text-[8px] text-white font-extrabold">S</span>
                     <span className="text-sm font-extrabold tracking-wider text-gray-800 uppercase">SKLPSS</span>
                   </div>
-                  <span className="text-[9px] font-bold text-[#F48F0F]/80 uppercase tracking-[0.15em] mt-0.5">Official Identity Card</span>
+                  <span className="text-[9px] font-bold text-[#F48F0F]/80 uppercase tracking-[0.15em] mt-0.5">Committee member</span>
                 </div>
 
                 {/* Profile Photo */}
@@ -442,9 +442,6 @@ const ManageMembers = () => {
                       {selectedCardMember.Fname[0]}{selectedCardMember.LName ? selectedCardMember.LName[0] : ""}
                     </div>
                   )}
-                  <div className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 bg-[#F48F0F] text-white text-[8px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
-                    MEMBER
-                  </div>
                 </div>
 
                 {/* Name and Designation */}

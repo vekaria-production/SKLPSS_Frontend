@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddEditNoteModal from "./AddEditNoteModal";
-import { FaPlus, FaTrash, FaEdit, FaPaperclip, FaDownload } from "react-icons/fa";
+import { FaPlus, FaTrash, FaEdit, FaPaperclip, FaDownload, FaEye } from "react-icons/fa";
 
 const MeetingNotesPanel = ({ meeting, onClose }) => {
-  const [activeTab, setActiveTab] = useState("notes");
+  const [activeTab, setActiveTab] = useState("attachments");
   const [notes, setNotes] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [editNote, setEditNote] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [previewAttachment, setPreviewAttachment] = useState(null);
 
   const fetchNotes = async () => {
     try {
@@ -237,7 +238,7 @@ const MeetingNotesPanel = ({ meeting, onClose }) => {
                     <button
                       disabled={uploading}
                       onClick={uploadAttachments}
-                      className="bg-[#F48F0F] disabled:opacity-50 text-white px-3 py-1.5 rounded-lg hover:opacity-90 text-xs w-full font-medium"
+                      className="bg-[#F48F0F] disabled:opacity-50 text-white px-4 py-2.5 rounded-xl hover:opacity-90 text-sm w-full font-medium"
                     >
                       {uploading ? "Uploading..." : "Upload Selected Files"}
                     </button>
@@ -254,8 +255,12 @@ const MeetingNotesPanel = ({ meeting, onClose }) => {
                 <div className="space-y-2">
                   {attachments.map((a) => (
                     <div key={a.id} className="border border-gray-100 p-3 rounded-lg flex items-center justify-between hover:bg-gray-50 transition-colors">
-                      <div className="flex flex-col min-w-0 pr-2">
-                        <span className="text-xs font-medium text-gray-700 truncate max-w-[260px]" title={a.fileName}>
+                      <div 
+                        className="flex flex-col min-w-0 pr-2 cursor-pointer group/item"
+                        onClick={() => setPreviewAttachment(a)}
+                        title="Preview attachment"
+                      >
+                        <span className="text-xs font-medium text-gray-700 truncate max-w-[220px] group-hover/item:text-[#F48F0F] group-hover/item:underline" title={a.fileName}>
                           {a.fileName}
                         </span>
                         {a.createdAt && (
@@ -264,22 +269,29 @@ const MeetingNotesPanel = ({ meeting, onClose }) => {
                           </span>
                         )}
                       </div>
-                      <div className="flex gap-2.5 flex-shrink-0">
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => setPreviewAttachment(a)}
+                          className="text-[#F48F0F] hover:text-[#dc7d00] p-2 hover:bg-orange-50 rounded-lg transition-colors"
+                          title="Preview"
+                        >
+                          <FaEye size={16} />
+                        </button>
                         <a
                           href={a.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#F48F0F] hover:text-[#dc7d00] p-1.5 hover:bg-orange-50 rounded"
+                          className="text-[#F48F0F] hover:text-[#dc7d00] p-2 hover:bg-orange-50 rounded-lg transition-colors flex items-center justify-center"
                           title="Download"
                         >
-                          <FaDownload size={12} />
+                          <FaDownload size={16} />
                         </a>
                         <button
                           onClick={() => deleteAttachment(a.id)}
-                          className="text-red-500 hover:text-red-600 p-1.5 hover:bg-red-50 rounded"
+                          className="text-red-500 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
-                          <FaTrash size={11} />
+                          <FaTrash size={15} />
                         </button>
                       </div>
                     </div>
@@ -298,6 +310,73 @@ const MeetingNotesPanel = ({ meeting, onClose }) => {
             onClose={() => setEditNote(null)}
             onSaved={fetchNotes}
           />
+        )}
+        
+        {previewAttachment && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+            <div className="bg-white rounded-3xl w-[90vw] max-w-6xl h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in relative border border-gray-100">
+              
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-[#FDF8F3]">
+                <div>
+                  <h3 className="font-bold text-gray-800 text-lg truncate max-w-[500px]">
+                    {previewAttachment.fileName}
+                  </h3>
+                  <p className="text-xs text-gray-500">Attachment Preview</p>
+                </div>
+                <button
+                  onClick={() => setPreviewAttachment(null)}
+                  className="text-gray-500 hover:text-gray-800 font-semibold text-sm px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+
+              {/* Preview Content */}
+              <div className="flex-1 bg-gray-50 p-4 flex items-center justify-center overflow-auto">
+                {(() => {
+                  const ext = previewAttachment.fileName.split(".").pop().toLowerCase();
+                  const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+                  const isPdf = ext === "pdf";
+
+                  if (isImage) {
+                    return (
+                      <img
+                        src={previewAttachment.fileUrl}
+                        alt={previewAttachment.fileName}
+                        className="max-w-full max-h-full object-contain rounded-xl shadow-md"
+                      />
+                    );
+                  } else if (isPdf) {
+                    return (
+                      <iframe
+                        src={`${previewAttachment.fileUrl}#toolbar=0`}
+                        title={previewAttachment.fileName}
+                        className="w-full h-full rounded-xl border border-gray-200 shadow-sm"
+                      />
+                    );
+                  } else {
+                    return (
+                      <div className="text-center p-8 bg-white border border-gray-100 rounded-3xl max-w-sm shadow-sm">
+                        <FaPaperclip className="text-5xl text-[#F48F0F] mx-auto mb-4" />
+                        <h4 className="font-bold text-gray-800 mb-2">No Preview Available</h4>
+                        <p className="text-xs text-gray-500 mb-6">
+                          This file type (.{ext}) cannot be previewed in the browser. Please download the file to view it.
+                        </p>
+                        <a
+                          href={previewAttachment.fileUrl}
+                          download
+                          className="inline-flex items-center gap-2 bg-[#F48F0F] text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition-all shadow-md shadow-[#F48F0F]/15"
+                        >
+                          <FaDownload size={14} /> Download File
+                        </a>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
