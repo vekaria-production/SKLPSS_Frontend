@@ -5,6 +5,7 @@ import { FaFilter } from "react-icons/fa";
 import DocumentTable from "./DocumentTable";
 import DocumentFilters from "./DocumentFilters";
 import UploadDocumentModal from "./UploadDocumentModal";
+import EditDocumentModal from "./EditDocumentModal";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import useDebounce from "../../../hooks/useDebounce";
 
@@ -18,6 +19,7 @@ const DocumentManagement = () => {
   const [showFiltersRow, setShowFiltersRow] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 400);
 
@@ -82,6 +84,7 @@ const DocumentManagement = () => {
         {/* Table */}
         <DocumentTable
           documents={documents}
+          onEdit={setEditTarget}
           onDelete={setDeleteTarget}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -96,6 +99,15 @@ const DocumentManagement = () => {
           <UploadDocumentModal
             onClose={() => setShowUpload(false)}
             onUploaded={() => fetchDocuments(debouncedSearchTerm, filters)}
+          />
+        )}
+
+        {/* Edit */}
+        {editTarget && (
+          <EditDocumentModal
+            document={editTarget}
+            onClose={() => setEditTarget(null)}
+            onUpdated={() => fetchDocuments(debouncedSearchTerm, filters)}
           />
         )}
 

@@ -1,9 +1,10 @@
 import React from "react";
-import { FaTrash, FaDownload } from "react-icons/fa";
+import { FaTrash, FaDownload, FaEdit } from "react-icons/fa";
 import CustomTable from "../reusable/CustomTable";
 
 const DocumentTable = ({
   documents,
+  onEdit,
   onDelete,
   searchTerm,
   setSearchTerm,
@@ -27,18 +28,26 @@ const DocumentTable = ({
       rows={documents.map((doc) => ({
         ...doc,
         Status: doc.Status,
-        CreatedAt: new Date(doc.CreatedAt).toLocaleDateString(),
+        CreatedAt: doc.created_at ? new Date(doc.created_at).toLocaleDateString() : "N/A",
         actions: (
           <>
             <FaDownload
               size={18}
               className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer mr-3 transition-colors"
               onClick={() => window.open(doc.DocumentLink, "_blank")}
+              title="Download File"
+            />
+            <FaEdit
+              size={18}
+              className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer mr-3 transition-colors"
+              onClick={() => onEdit(doc)}
+              title="Edit Document"
             />
             <FaTrash
               size={18}
               className="text-red-500 hover:text-red-600 cursor-pointer transition-colors"
               onClick={() => onDelete(doc)}
+              title="Delete Document"
             />
           </>
         ),
