@@ -17,6 +17,8 @@ export const AuthProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : null;
   });
 
+  const [isInitializing, setIsInitializing] = useState(!!localStorage.getItem("token"));
+
   const login = (accessToken, refresh, userPermissions = [], userInfo = null) => {
     localStorage.setItem("token", accessToken);
     localStorage.setItem("refreshToken", refresh);
@@ -81,12 +83,13 @@ export const AuthProvider = ({ children }) => {
         hasRefreshed.current = true;
         await refreshAccessToken();
       }
+      setIsInitializing(false);
     };
     tryRefreshOnLoad();
   }, [token, refreshAccessToken]);
 
   return (
-    <AuthContext.Provider value={{ token, refreshAccessToken, login, logout, permissions, user }}>
+    <AuthContext.Provider value={{ token, refreshAccessToken, login, logout, permissions, user, isInitializing }}>
       {children}
     </AuthContext.Provider>
   );
