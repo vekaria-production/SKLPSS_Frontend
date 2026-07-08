@@ -131,7 +131,7 @@ export default function QrScanner() {
       }
 
       if (typeof reader.decodeFromVideoDevice === "function") {
-        const maybeControls = reader.decodeFromVideoDevice(
+        const maybeControls = await reader.decodeFromVideoDevice(
           deviceId,
           videoRef.current,
           (result, error) => {
@@ -162,6 +162,13 @@ export default function QrScanner() {
       console.error("Camera error:", error);
       setStatus("⚠️ Unable to access camera");
       setScanning(false);
+      
+      const errorMessage = error?.message || error?.name || String(error);
+      if (errorMessage.toLowerCase().includes("permission denied") || errorMessage.includes("NotAllowedError")) {
+        alert("Camera access was denied. Please allow camera permissions in your browser settings to scan QR codes.");
+      } else {
+        alert("Unable to access camera: " + errorMessage);
+      }
     }
   };
 
