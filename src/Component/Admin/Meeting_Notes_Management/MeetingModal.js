@@ -65,31 +65,31 @@ const MeetingModal = ({ meeting, onClose, onSaved }) => {
           onChange={(e) => setForm({ ...form, MeetingLink: e.target.value })}
         />
 
-        {/* Start Time */}
-        <label className="text-sm text-gray-600 mb-1 block">
-        Start Time
-        </label>
-        <input
-        type="datetime-local"
-        className="border w-full mb-3 p-2 rounded"
-        value={form.StartTime}
-        onChange={(e) =>
-            setForm({ ...form, StartTime: e.target.value })
-        }
-        />
-
-        {/* End Time */}
-        <label className="text-sm text-gray-600 mb-1 block">
-        End Time
-        </label>
-        <input
-        type="datetime-local"
-        className="border w-full mb-3 p-2 rounded"
-        value={form.EndTime}
-        onChange={(e) =>
-            setForm({ ...form, EndTime: e.target.value })
-        }
-        />
+        {/* Date Fields */}
+        <div className="grid grid-cols-2 gap-4 mb-3">
+          <div>
+            <label className="block font-medium mb-1 text-sm text-gray-600">From Date:</label>
+            <input
+              type="datetime-local"
+              className="border border-gray-300 w-full p-2 rounded"
+              value={form.StartTime}
+              onChange={(e) =>
+                setForm({ ...form, StartTime: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <label className="block font-medium mb-1 text-sm text-gray-600">To Date:</label>
+            <input
+              type="datetime-local"
+              className="border border-gray-300 w-full p-2 rounded"
+              value={form.EndTime}
+              onChange={(e) =>
+                setForm({ ...form, EndTime: e.target.value })
+              }
+            />
+          </div>
+        </div>
 
         {/* ✅ Status Dropdown */}
         <select
