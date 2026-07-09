@@ -28,7 +28,7 @@ const DocumentTable = ({
       rows={documents.map((doc) => ({
         ...doc,
         Status: doc.Status,
-        CreatedAt: doc.created_at ? new Date(doc.created_at).toLocaleDateString() : "N/A",
+        CreatedAt: doc.created_at ? new Date(doc.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) : "N/A",
         actions: (
           <>
             <FaDownload

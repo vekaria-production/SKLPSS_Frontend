@@ -188,7 +188,7 @@ const MeetingNotesPanel = ({ meeting, onClose }) => {
                       <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{n.note}</p>
                       {n.createdAt && (
                         <p className="text-[10px] text-gray-400 mt-2">
-                          {new Date(n.createdAt).toLocaleString()}
+                          {new Date(n.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
                         </p>
                       )}
                       <div className="flex gap-4 mt-3 pt-2 border-t border-gray-50">
@@ -265,7 +265,7 @@ const MeetingNotesPanel = ({ meeting, onClose }) => {
                         </span>
                         {a.createdAt && (
                           <span className="text-[9px] text-gray-400 mt-0.5">
-                            Uploaded: {new Date(a.createdAt).toLocaleDateString()}
+                            Uploaded: {new Date(a.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
                           </span>
                         )}
                       </div>

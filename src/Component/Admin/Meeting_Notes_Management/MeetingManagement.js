@@ -139,8 +139,8 @@ const MeetingManagement = () => {
             onRowClick={(row) => setSelectedMeeting(row)}
             rows={meetings.map((m) => ({
               ...m,
-              formattedStartTime: new Date(m.startTime).toLocaleString(),
-              formattedEndTime: m.endTime ? new Date(m.endTime).toLocaleString() : "-",
+              formattedStartTime: new Date(m.startTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+              formattedEndTime: m.endTime ? new Date(m.endTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) : "-",
               actions: (
                 <div className="flex gap-3">
                   <FaStickyNote
@@ -206,11 +206,11 @@ const MeetingManagement = () => {
                     <div className="space-y-1.5 text-xs text-gray-500 mb-4">
                       <div>
                         <span className="font-medium text-gray-400">Start: </span>
-                        <span className="font-semibold text-gray-700">{new Date(m.startTime).toLocaleString()}</span>
+                        <span className="font-semibold text-gray-700">{new Date(m.startTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                       </div>
                       <div>
                         <span className="font-medium text-gray-400">End: </span>
-                        <span className="font-semibold text-gray-700">{m.endTime ? new Date(m.endTime).toLocaleString() : "-"}</span>
+                        <span className="font-semibold text-gray-700">{m.endTime ? new Date(m.endTime).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) : "-"}</span>
                       </div>
                     </div>
                   </div>
