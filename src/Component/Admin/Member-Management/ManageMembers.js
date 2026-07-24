@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { FaSearch, FaEdit, FaTrash, FaFilter, FaCog, FaIdCard, FaPrint } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaFilter, FaCog, FaIdCard, FaPrint, FaCheck, FaTimes } from "react-icons/fa";
 import SidebarLayout from "../reusable/SidebarLayout";
 import CustomTable from "../reusable/CustomTable";
 import DeleteConfirmation from "../reusable/DeleteConfirmation";
@@ -20,6 +20,8 @@ const ManageMembers = () => {
   const [localPositions, setLocalPositions] = useState([]);
   const [cutoffId, setCutoffId] = useState("");
   const [savingPositions, setSavingPositions] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [contactFilter, setContactFilter] = useState("");
@@ -136,6 +138,7 @@ const ManageMembers = () => {
         `${process.env.REACT_APP_NETWORK}/updatePositionList`,
         localPositions.map(p => ({
           Id: p.Id,
+          Name: p.Name,
           SortOrder: p.SortOrder,
           IsVisible: p.IsVisible
         })),
@@ -148,12 +151,59 @@ const ManageMembers = () => {
       
       refresh("PositionList");
       setShowArrangeModal(false);
+      alert("Designations saved successfully!");
     } catch (error) {
       console.error("Error updating designations:", error);
       alert("Failed to save designations. Please try again.");
     } finally {
       setSavingPositions(false);
     }
+  };
+
+  const handleDeletePosition = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this designation?")) return;
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_NETWORK}/deletePosition/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+      setLocalPositions(prev => prev.filter(p => p.Id !== id));
+      refresh("PositionList");
+      alert("Designation deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting designation:", error);
+      const msg = error.response?.data?.detail || "Failed to delete designation.";
+      alert(msg);
+    }
+  };
+
+  const startEditing = (p) => {
+    setEditingId(p.Id);
+    setEditingName(p.Name);
+  };
+
+  const saveEditingName = (id) => {
+    if (!editingName.trim()) {
+      alert("Name cannot be empty.");
+      return;
+    }
+    setLocalPositions(prev => prev.map(p => {
+      if (p.Id === id) {
+        return { ...p, Name: editingName.trim() };
+      }
+      return p;
+    }));
+    setEditingId(null);
+    setEditingName("");
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditingName("");
   };
   const genderOptions = ["M", "F"];
 
@@ -640,7 +690,7 @@ const ManageMembers = () => {
                   </select>
                 </div>
 
-                {/* List Table */}
+                 {/* List Table */}
                 <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
                   <table className="w-full text-sm border-collapse text-left">
                     <thead className="bg-[#EDE4DC] text-[#292929]">
@@ -648,12 +698,24 @@ const ManageMembers = () => {
                         <th className="px-4 py-2.5 font-bold">Designation</th>
                         <th className="px-4 py-2.5 font-bold text-center w-[120px]">Order</th>
                         <th className="px-4 py-2.5 font-bold text-center w-[120px]">Visible</th>
+                        <th className="px-4 py-2.5 font-bold text-center w-[120px]">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 bg-white">
                       {localPositions.map((p, idx) => (
                         <tr key={p.Id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3 font-medium text-gray-800">{p.Name}</td>
+                          <td className="px-4 py-3 font-medium text-gray-800">
+                            {editingId === p.Id ? (
+                              <input
+                                type="text"
+                                value={editingName}
+                                onChange={(e) => setEditingName(e.target.value)}
+                                className="border border-gray-300 rounded px-2 py-1 text-sm bg-white focus:border-[#F48F0F] outline-none w-full font-normal"
+                              />
+                            ) : (
+                              <span>{p.Name}</span>
+                            )}
+                          </td>
                           <td className="px-4 py-3 text-center">
                             <div className="flex justify-center items-center gap-1.5">
                               <button
@@ -681,6 +743,45 @@ const ManageMembers = () => {
                               onChange={() => handleToggleVisible(p.Id)}
                               className="accent-[#F48F0F] w-4.5 h-4.5 cursor-pointer"
                             />
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex justify-center items-center gap-2">
+                              {editingId === p.Id ? (
+                                <>
+                                  <button
+                                    onClick={() => saveEditingName(p.Id)}
+                                    className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors cursor-pointer"
+                                    title="Save"
+                                  >
+                                    <FaCheck size={14} />
+                                  </button>
+                                  <button
+                                    onClick={cancelEditing}
+                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                                    title="Cancel"
+                                  >
+                                    <FaTimes size={14} />
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() => startEditing(p)}
+                                    className="p-1.5 text-[#F48F0F] hover:bg-orange-50 rounded transition-colors cursor-pointer"
+                                    title="Edit Name"
+                                  >
+                                    <FaEdit size={14} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeletePosition(p.Id)}
+                                    className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                                    title="Delete"
+                                  >
+                                    <FaTrash size={14} />
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}

@@ -94,7 +94,7 @@ export default function CommitteeTreeWithModal() {
           parentPosId: p.parentId,
           title: p.name,
           name: `${m.Fname} ${m.LName}`,
-          img: m.Image || (p.id === 1 ? President : member),
+          img: m.Image || member,
           details: `Email: ${m.Email}\nContact: ${m.Contact}`,
           memberData: m
         };
@@ -286,10 +286,15 @@ export default function CommitteeTreeWithModal() {
               <p className="text-sm text-gray-600 mt-4 whitespace-pre-line leading-relaxed">
                 {modalData.details}
               </p>
-              {modalData.memberData?.BloodGroup && (
-                <p className="text-sm text-gray-600 mt-2">
+               {modalData.memberData?.BloodGroup && (
+                <p className="text-sm text-gray-600 mt-2 font-normal">
                   Blood Group: {modalData.memberData.BloodGroup}
                 </p>
+              )}
+              {modalData.parentPosId === null && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-100 rounded-xl text-xs text-yellow-800 font-medium text-center">
+                  This designation is at the top-most level. Only one person will be having that.
+                </div>
               )}
             </div>
           </div>
