@@ -4,6 +4,8 @@ import President from '../../../assets/president.png';
 import axios from 'axios';
 import { useOptions } from "../../../hooks/useOptions";
 
+const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'><circle cx='12' cy='12' r='12' fill='%23edf2f7'/><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+
 export default function CommitteeTreeWithModal() {
   const {
     position,
@@ -99,7 +101,7 @@ export default function CommitteeTreeWithModal() {
           parentPosId: p.parentId,
           title: p.name,
           name: `${m.Fname} ${m.LName}`,
-          img: m.Image || null,
+          img: m.Image || defaultAvatar,
           details: `Email: ${m.Email}\nContact: ${m.Contact}`,
           memberData: m
         };
@@ -281,18 +283,14 @@ export default function CommitteeTreeWithModal() {
               &times;
             </button>
             <div className="text-center">
-              {modalData.img && !modalImgError ? (
-                <img
-                  src={modalData.img}
-                  alt={modalData.title}
-                  className="w-28 h-28 rounded-full mx-auto mb-4 object-cover border border-gray-100"
-                  onError={() => setModalImgError(true)}
-                />
-              ) : (
-                <div className="w-28 h-28 rounded-full mx-auto mb-4 flex items-center justify-center bg-[#EDE4DC] text-[#F48F0F] text-xs font-bold px-2 text-center uppercase tracking-wider leading-tight border border-[#F48F0F]/20 select-none">
-                  {modalData.title}
-                </div>
-              )}
+              <img
+                src={modalData.img || defaultAvatar}
+                alt={modalData.title}
+                className="w-28 h-28 rounded-full mx-auto mb-4 object-cover border border-gray-100"
+                onError={(e) => {
+                  e.target.src = defaultAvatar;
+                }}
+              />
               <h3 className="text-xl font-bold mb-2 text-gray-800">{modalData.title}</h3>
               <p className="text-sm text-gray-700">{modalData.name}</p>
               <p className="text-sm text-gray-600 mt-4 whitespace-pre-line leading-relaxed">
@@ -312,47 +310,38 @@ export default function CommitteeTreeWithModal() {
 }
 
 // NodeCard component
-const NodeCard = React.forwardRef(({ img, title, name, isHovered, onClick }, ref) => {
-  const [hasError, setHasError] = useState(false);
-  const showImage = img && !hasError;
-
-  return (
-    <div
-      ref={ref}
-      onClick={onClick}
-      className={`text-center p-4 rounded-lg shadow-md w-36 mx-auto transition-transform duration-200
-        bg-white bg-opacity-50
-        backdrop-filter backdrop-blur-md
-        border border-white border-opacity-30
-        ${isHovered ? 'scale-105 shadow-yellow-400 border-yellow-400 bg-opacity-30' : ''}
-      `}
-      style={{
-        WebkitBackdropFilter: 'blur(10px)',
-        backdropFilter: 'blur(2px)',
-        boxShadow: isHovered
-          ? '0 8px 32px 0 rgba(251, 191, 36, 0.4)'
-          : '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
-        borderRadius: '12px',
-        cursor: 'pointer'
+const NodeCard = React.forwardRef(({ img, title, name, isHovered, onClick }, ref) => (
+  <div
+    ref={ref}
+    onClick={onClick}
+    className={`text-center p-4 rounded-lg shadow-md w-36 mx-auto transition-transform duration-200
+      bg-white bg-opacity-50
+      backdrop-filter backdrop-blur-md
+      border border-white border-opacity-30
+      ${isHovered ? 'scale-105 shadow-yellow-400 border-yellow-400 bg-opacity-30' : ''}
+    `}
+    style={{
+      WebkitBackdropFilter: 'blur(10px)',
+      backdropFilter: 'blur(2px)',
+      boxShadow: isHovered
+        ? '0 8px 32px 0 rgba(251, 191, 36, 0.4)'
+        : '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
+      borderRadius: '12px',
+      cursor: 'pointer'
+    }}
+  >
+    <img 
+      src={img || defaultAvatar} 
+      alt={title} 
+      className="w-20 h-20 mx-auto rounded-full mb-3 object-cover border border-gray-100" 
+      onError={(e) => {
+        e.target.src = defaultAvatar;
       }}
-    >
-      {showImage ? (
-        <img 
-          src={img} 
-          alt={title} 
-          className="w-20 h-20 mx-auto rounded-full mb-3 object-cover border border-gray-100" 
-          onError={() => setHasError(true)}
-        />
-      ) : (
-        <div className="w-20 h-20 mx-auto rounded-full mb-3 flex items-center justify-center bg-[#EDE4DC] text-[#F48F0F] text-[10px] font-bold px-1.5 text-center uppercase tracking-wider leading-tight border border-[#F48F0F]/20 select-none">
-          {title}
-        </div>
-      )}
-      <div className="font-semibold text-base text-gray-900">{title}</div>
-      <div className="text-sm text-gray-700 truncate" title={name}>{name}</div>
-    </div>
-  );
-});
+    />
+    <div className="font-semibold text-base text-gray-900">{title}</div>
+    <div className="text-sm text-gray-700 truncate" title={name}>{name}</div>
+  </div>
+));
 
 // AnimatedPath component
 function AnimatedPath({ d, highlighted }) {

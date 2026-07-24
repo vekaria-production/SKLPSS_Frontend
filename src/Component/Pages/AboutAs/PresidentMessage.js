@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'><circle cx='12' cy='12' r='12' fill='%23edf2f7'/><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+
 export default function PresidentMessage() {
   const [president, setPresident] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     async function fetchPresident() {
@@ -45,24 +46,20 @@ export default function PresidentMessage() {
   }
 
   const presidentName = `${president.Fname || ""} ${president.LName || ""}`.trim();
-  const showImage = president.Image && !imgError;
+  const presidentImage = president.Image || defaultAvatar;
 
   return (
     <section className="max-w-5xl mx-auto px-4 py-8">
       <div className="bg-white rounded-xl shadow-md p-6 grid md:grid-cols-3 gap-6 items-center">
         <div className="w-full flex justify-center">
-          {showImage ? (
-            <img
-              src={president.Image}
-              alt="President"
-              className="rounded-lg w-full max-h-[350px] object-cover border border-gray-100"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="w-full min-h-[200px] h-full rounded-lg flex items-center justify-center bg-[#EDE4DC] text-[#F48F0F] text-lg font-bold px-4 py-8 text-center uppercase tracking-wider border border-[#F48F0F]/20 select-none">
-              President
-            </div>
-          )}
+          <img
+            src={presidentImage}
+            alt="President"
+            className="rounded-lg w-full max-h-[350px] object-cover"
+            onError={(e) => {
+              e.target.src = defaultAvatar;
+            }}
+          />
         </div>
         <div className="md:col-span-2">
           <h3 className="text-xl font-bold text-gray-800">President's Message</h3>
