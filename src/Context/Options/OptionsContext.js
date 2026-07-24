@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 // List of option paths
@@ -39,7 +39,7 @@ export const OptionsProvider = ({ children }) => {
   };
 
   // Fetch all options initially
-  const fetchAllOptions = async () => {
+  const fetchAllOptions = useCallback(async () => {
     setLoading(true);
     const newOptions = {};
     const newErrors = {};
@@ -58,7 +58,7 @@ export const OptionsProvider = ({ children }) => {
     setOptions(newOptions);
     setErrors(newErrors);
     setLoading(false);
-  };
+  }, []);
 
   // Refresh specific path
   const refresh = async (key) => {
@@ -73,7 +73,7 @@ export const OptionsProvider = ({ children }) => {
 
   useEffect(() => {
     fetchAllOptions();
-  }, []);
+  }, [fetchAllOptions]);
 
   return (
     <OptionsContext.Provider value={{ options, loading, errors, refresh }}>
