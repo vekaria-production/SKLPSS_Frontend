@@ -1,186 +1,8 @@
-// import React, { useEffect, useState, useCallback } from "react";
-// import { useParams, useLocation } from "react-router-dom";
-// import Lightbox from "react-image-lightbox";
-// import "react-image-lightbox/style.css";
-// import Back from "../../UI/Back_button/Back";
-// import LoadingSpinner from "../../UI/LoadingSpiner/LoadingSpinner";
-// import PhotoGridDisplay from "../../UI/PhotoGrid/PhotoGridDisplay";
-// import axios from "axios";
-
-// const GalleryEvent = () => {
-//   const { Id } = useParams();
-//   const location = useLocation();
-//   const event = location.state?.event;
-
-//   const [eventData, setEventData] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [isLoadingMore, setIsLoadingMore] = useState(false);
-//   const [photoIndex, setPhotoIndex] = useState(0);
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [offset, setOffset] = useState(0);
-//   const [hasMore, setHasMore] = useState(true);
-
-//   const limit = 10; // Number of images to fetch per request
-
-//   // ✅ Normalize images into proper Google Drive links
-//   const images = eventData.map((item) =>
-//     item.Link.startsWith("http")
-//       ? item.Link
-//       : `https://lh3.googleusercontent.com/d/${item.Link}=w4000?authuser=0`
-//   );
-
-//   // ✅ Fetch images
-//   const fetchEventImages = useCallback(
-//     async (currentOffset) => {
-//       if (!hasMore || isLoadingMore) return;
-//       setIsLoadingMore(true);
-
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_NETWORK}/getEventImages/${Id}?offset=${currentOffset}&limit=${limit}`,
-//           {
-//             headers: {
-//               Authorization: `Bearer ${localStorage.getItem("token")}`,
-//             },
-//           }
-//         );
-
-//         let data = response.data;
-//         if (typeof data === "string") {
-//           data = JSON.parse(data);
-//         }
-
-//         setEventData((prevData) => [...prevData, ...data]);
-//         setOffset((prev) => prev + limit);
-//         if (data.length < limit) setHasMore(false);
-//       } catch (error) {
-//         console.error("Error fetching images:", error);
-//       } finally {
-//         setIsLoading(false);
-//         setIsLoadingMore(false);
-//       }
-//     },
-//     [Id, hasMore, isLoadingMore]
-//   );
-
-//   // ✅ Reset when Id changes
-//   useEffect(() => {
-//     setEventData([]);
-//     setOffset(0);
-//     setHasMore(true);
-//     setIsLoading(true);
-//     fetchEventImages(0);
-//   }, [Id, fetchEventImages]);
-
-//   // ✅ Infinite scroll with debounce
-//   useEffect(() => {
-//     let timeout;
-//     const handleScroll = () => {
-//       if (timeout) clearTimeout(timeout);
-//       timeout = setTimeout(() => {
-//         if (
-//           window.innerHeight + document.documentElement.scrollTop >=
-//             document.documentElement.offsetHeight - 100 &&
-//           hasMore &&
-//           !isLoadingMore
-//         ) {
-//           fetchEventImages(offset);
-//         }
-//       }, 200);
-//     };
-
-//     window.addEventListener("scroll", handleScroll);
-//     return () => {
-//       if (timeout) clearTimeout(timeout);
-//       window.removeEventListener("scroll", handleScroll);
-//     };
-//   }, [fetchEventImages, offset, hasMore, isLoadingMore]);
-
-//   // ✅ Empty / loading states
-//   if (isLoading && !eventData.length) return <LoadingSpinner />;
-//   if (!eventData.length && !isLoading)
-//     return (
-//       <div className="text-center text-red-500">
-//         No images found for this event
-//       </div>
-//     );
-
-//   return (
-//     <div className="bg-[#FDF8F3] min-h-screen px-4 sm:px-8 py-5">
-//       <Back />
-//       <h1 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
-//         {event?.Name || "Event Gallery"}
-//       </h1>
-//       <p className="text-center text-gray-600 max-w-3xl mx-auto mb-10">
-//         {event?.Description || "View images from this event."}
-//       </p>
-
-//       <PhotoGridDisplay
-//         images={images}
-//         onImageClick={(index) => {
-//           setPhotoIndex(index);
-//           setIsOpen(true);
-//         }}
-//       />
-
-//       {isLoadingMore && (
-//         <div className="text-center my-4">
-//           <LoadingSpinner />
-//         </div>
-//       )}
-
-//       {isOpen && images.length > 0 && (
-//         <Lightbox
-//           mainSrc={images[photoIndex]}
-//           nextSrc={images[(photoIndex + 1) % images.length]}
-//           prevSrc={images[(photoIndex + images.length - 1) % images.length]}
-//           onCloseRequest={() => setIsOpen(false)}
-//           onMovePrevRequest={() =>
-//             setPhotoIndex((photoIndex + images.length - 1) % images.length)
-//           }
-//           onMoveNextRequest={() =>
-//             setPhotoIndex((photoIndex + 1) % images.length)
-//           }
-//         />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default GalleryEvent;
-
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import PhotoGridDisplay from "../../UI/PhotoGrid/PhotoGridDisplay";
-// import SidebarLayout from "./../../Admin/reusable/SidebarLayout";
+import Back from "../../UI/Back_button/Back";
 import axios from "axios";
-// import { compressImages } from "./../../Admin/reusable/ImageCompressor";
-
-const uploadImages = async (files, Id) => {
-  const formData = new FormData();
-  files.forEach((file) => {
-    formData.append("files", file); // "files" must match the FastAPI parameter name
-  });
-
-  try {
-    const response = await axios.post(
-      `${process.env.REACT_APP_NETWORK}/updateEventImage/${Id}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    console.log("Upload successful:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Upload error:", error);
-    throw error;
-  }
-};
 
 const GalleryEvent = () => {
   const { Id } = useParams();
@@ -188,11 +10,15 @@ const GalleryEvent = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true); // Track if more images are available
-  const limit = 10; // Number of images to fetch per request
-  const observer = useRef(); // For IntersectionObserver
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
+  const observer = useRef();
   const location = useLocation();
   const events = location.state?.event;
+
+  // Lightbox States
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Fetch images with pagination
   const fetchCategories = useCallback(async (currentOffset) => {
@@ -212,12 +38,17 @@ const GalleryEvent = () => {
       if (typeof data === 'string') {
         data = JSON.parse(data);
       }
-      // console.log("Fetched photos:", data);
-      setPhotos((prev) => [...prev, ...data.map(item => item.Link)]);
-      // setPhotos(data.map(item => item.Link));
+
+      const newLinks = data.map(item => item.Link);
+      
+      if (currentOffset === 0) {
+        setPhotos(newLinks);
+      } else {
+        setPhotos((prev) => [...prev, ...newLinks]);
+      }
 
       setOffset(currentOffset + limit);
-      setHasMore(data.length === limit); // If fewer images than limit, no more data
+      setHasMore(data.length === limit);
     } catch (error) {
       console.info("No more photos loaded.");
       setHasMore(false);
@@ -226,18 +57,57 @@ const GalleryEvent = () => {
     }
   }, [Id, hasMore, isLoading]);
 
-  const hasRun = useRef(false);
-
   useEffect(() => {
-    if (hasRun.current) return; // Skip if already run (ignores StrictMode double)
-    hasRun.current = true;
-
     setSelectedEvent(events);
     setPhotos([]);
     setOffset(0);
     setHasMore(true);
-    fetchCategories(0);
-  }, [Id, events]); // Dependencies unchanged
+    
+    // Fetch initial chunk
+    setIsLoading(false);
+    // Directly run fetchCategories at offset 0
+    // Bypass hasMore check for initial load by invoking API directly
+    const fetchInitial = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_NETWORK}/getEventImages/${Id}?offset=0&limit=${limit}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+        let data = response.data;
+        if (typeof data === 'string') data = JSON.parse(data);
+        const links = data.map(item => item.Link);
+        setPhotos(links);
+        setOffset(limit);
+        setHasMore(data.length === limit);
+      } catch (error) {
+        setPhotos([]);
+        setHasMore(false);
+      }
+    };
+    fetchInitial();
+  }, [Id, events]);
+
+  // Keyboard navigation for Lightbox
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      } else if (e.key === "ArrowRight") {
+        setPhotoIndex((prev) => (prev + 1) % photos.length);
+      } else if (e.key === "ArrowLeft") {
+        setPhotoIndex((prev) => (prev + photos.length - 1) % photos.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, photos.length]);
 
   // IntersectionObserver setup for infinite scrolling
   const lastPhotoRef = useCallback(
@@ -246,9 +116,7 @@ const GalleryEvent = () => {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          console.log("Fetching more photos...");
           fetchCategories(offset);
-
         }
       });
       if (node) observer.current.observe(node);
@@ -256,58 +124,114 @@ const GalleryEvent = () => {
     [isLoading, hasMore, fetchCategories, offset]
   );
 
-  // const handleAddPhotos = async (e) => {
-  //   const files = Array.from(e.target.files);
-  //   if (files.length === 0) return;
-
-  //   setIsLoading(true);
-  //   try {
-  //     const compressedFiles = await compressImages(files);
-  //     await uploadImages(compressedFiles, Id);
-
-  //     // Option A: Re-fetch but don't clear first
-  //     setOffset(0);
-  //     setHasMore(true);
-  //     await fetchCategories(0);   // ⬅️ await ensures photos refill before render
-  //   } catch (error) {
-  //     console.error("Failed to upload images:", error);
-  //     alert("Failed to upload images: " + (error.response?.data?.detail || error.message));
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-
-  // const handleDelete = (index) => {
-  //   setPhotos((prev) => prev.filter((_, i) => i !== index));
-  // };
-
   return (
-    // <SidebarLayout>
-      <div className="min-h-screen bg-[#FdF8F3] text-[#292929] p-4">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-center w-full">
-            {selectedEvent ? selectedEvent.Name : "Unknown Title"}
-          </h1>
+    <div className="min-h-screen bg-[#FdF8F3] text-[#292929] pb-12 font-sans">
+      <Back />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        {/* Hero Banner Section */}
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8 mb-8 text-center sm:text-left relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-[#F48F0F]/10 w-48 h-48 rounded-full blur-3xl -mr-12 -mt-12 pointer-events-none" />
+          <div className="relative z-10 flex flex-col justify-between gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                {selectedEvent ? selectedEvent.Name : "Event Gallery"}
+              </h1>
+              {selectedEvent && (selectedEvent.From || selectedEvent.To) && (
+                <p className="text-sm text-gray-500 mt-2.5 flex items-center justify-center sm:justify-start gap-1.5 font-medium">
+                  <span>📅</span> {selectedEvent.From} {selectedEvent.To && ` - ${selectedEvent.To}`}
+                </p>
+              )}
+              {selectedEvent?.Description && (
+                <p className="text-gray-600 mt-4 max-w-4xl text-sm sm:text-base leading-relaxed">
+                  {selectedEvent.Description}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <PhotoGridDisplay images={photos}  lastPhotoRef={lastPhotoRef} />
+        {/* Photo Grid Section */}
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-8">
+          <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+            <span>🖼️</span> Event Photos
+          </h2>
+          {photos.length > 0 ? (
+            <PhotoGridDisplay
+              images={photos}
+              lastPhotoRef={lastPhotoRef}
+              onImageClick={(index) => {
+                setPhotoIndex(index);
+                setIsOpen(true);
+              }}
+            />
+          ) : (
+            !isLoading && (
+              <div className="text-center py-12 text-gray-400 italic">
+                No photos approved for this event yet.
+              </div>
+            )
+          )}
 
-        {isLoading && (
-          <div className="text-center my-4">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
-            <p className="mt-2">Loading more images...</p>
-          </div>
-        )}
+          {isLoading && (
+            <div className="text-center my-6 flex flex-col items-center justify-center gap-2">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#F48F0F]"></div>
+              <p className="text-sm text-gray-500 font-medium">Loading more images...</p>
+            </div>
+          )}
 
-        {!hasMore && photos.length > 0 && (
-          <div className="text-center my-4">
-            <p>No more images to load.</p>
-          </div>
-        )}
+          {!hasMore && photos.length > 0 && (
+            <div className="text-center mt-8 pt-6 border-t border-gray-100">
+              <p className="text-sm text-gray-400 font-medium">No more images to load.</p>
+            </div>
+          )}
+        </div>
       </div>
- 
+
+      {/* Frosted Glass Lightbox */}
+      {isOpen && photos.length > 0 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md transition-all duration-300">
+          {/* Close button */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 text-white hover:text-[#F48F0F] text-4xl font-bold p-2 transition-colors cursor-pointer z-50 select-none"
+            aria-label="Close lightbox"
+          >
+            &times;
+          </button>
+
+          {/* Prev button */}
+          <button
+            onClick={() => setPhotoIndex((photoIndex + photos.length - 1) % photos.length)}
+            className="absolute left-4 sm:left-6 text-white hover:text-[#F48F0F] text-5xl font-normal p-3 select-none transition-colors cursor-pointer z-50 bg-white/5 hover:bg-white/10 rounded-full w-14 h-14 flex items-center justify-center"
+            aria-label="Previous photo"
+          >
+            &#8249;
+          </button>
+
+          {/* Image container */}
+          <div className="max-w-[85vw] max-h-[85vh] flex flex-col items-center justify-center">
+            <img
+              src={photos[photoIndex]}
+              alt={`Photo ${photoIndex + 1}`}
+              className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl select-none"
+            />
+            <span className="text-white/80 text-sm font-semibold mt-4 bg-black/40 px-3 py-1 rounded-full">
+              {photoIndex + 1} / {photos.length}
+            </span>
+          </div>
+
+          {/* Next button */}
+          <button
+            onClick={() => setPhotoIndex((photoIndex + 1) % photos.length)}
+            className="absolute right-4 sm:right-6 text-white hover:text-[#F48F0F] text-5xl font-normal p-3 select-none transition-colors cursor-pointer z-50 bg-white/5 hover:bg-white/10 rounded-full w-14 h-14 flex items-center justify-center"
+            aria-label="Next photo"
+          >
+            &#8250;
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

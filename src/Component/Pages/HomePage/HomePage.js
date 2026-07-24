@@ -4,6 +4,8 @@ import Banner from "./Banner";
 import Events from "./Events";
 import Partners from "./Partners";
 import EducationProgramsHighlight from "./EducationProgram";
+import CommunityInitiatives from "./CommunityInitiatives";
+
 function HomePage(){
 
     return(
@@ -11,6 +13,7 @@ function HomePage(){
             <Navbar/>
             <Banner/>
             <Events/>
+            <CommunityInitiatives/>
             {/* <Partners/> */}
             <EducationProgramsHighlight/>
             <Footer/>

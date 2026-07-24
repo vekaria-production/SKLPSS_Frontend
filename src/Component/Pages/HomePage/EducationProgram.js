@@ -1,17 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 
-// imported images
-import performanceImg from "./../../../assets/cook-off.png";
-import picnicImg from "./../../../assets/cook-off.png";
-import danceImg from "./../../../assets/cook-off.png";
-import gamesImg from "./../../../assets/cook-off.png";
+import gujaratiClassesImg from "./../../../assets/gujarati_classes.png";
+import educationMattersImg from "./../../../assets/education_matters.png";
 
 export default function EducationProgramsHighlight() {
   const galleryImages = [
-    { src: performanceImg, alt: "Performance at festival" },
-    // { src: picnicImg, alt: "Class picnic activity" },
-    // { src: danceImg, alt: "Dance performance" },
-    // { src: gamesImg, alt: "Games for students" },
+    { src: gujaratiClassesImg, alt: "Gujarati language classes for children" },
   ];
 
   const sectionRef = useRef(null);
@@ -166,9 +160,8 @@ export default function EducationProgramsHighlight() {
                 <img
                   src={img.src}
                   alt={img.alt}
-                  className="max-w-full max-h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
-
               </div>
             ))}
           </div>
@@ -192,9 +185,9 @@ export default function EducationProgramsHighlight() {
         <div className="w-full  relative h-[300px] lg:h-[400px] order-1  overflow-hidden">
           
           <img
-            src={picnicImg}
-            alt="Gujarati class picnic activity"
-            className="absolute  w-full h-full  rounded-r-lg lg:rounded-l-lg shadow-lg"
+            src={educationMattersImg}
+            alt="Gujarati cultural learning values"
+            className="absolute  w-full h-full  rounded-r-lg lg:rounded-l-lg shadow-lg object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30"></div>
         </div>

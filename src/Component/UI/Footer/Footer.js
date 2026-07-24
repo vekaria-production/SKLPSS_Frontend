@@ -2,8 +2,6 @@ import React from 'react';
 import {
   Facebook,
   Instagram,
-  Twitter,
-  Linkedin,
   ArrowUp,
 } from 'lucide-react';
 
@@ -60,8 +58,6 @@ function Footer() {
         <div className="flex gap-4 text-[#292929] text-lg">
           <a href="#" className="hover:text-[#F48F0F] transition" aria-label="Facebook"><Facebook size={18} /></a>
           <a href="#" className="hover:text-[#F48F0F] transition" aria-label="Instagram"><Instagram size={18} /></a>
-          <a href="#" className="hover:text-[#F48F0F] transition" aria-label="Twitter"><Twitter size={18} /></a>
-          <a href="#" className="hover:text-[#F48F0F] transition" aria-label="LinkedIn"><Linkedin size={18} /></a>
         </div>
 
         {/* Scroll to top */}

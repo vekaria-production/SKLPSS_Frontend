@@ -151,8 +151,10 @@ const EventsPage = () => {
             ev.status = "Ongoing";
           }
 
-          ev.From = formatDateTime(ev.From);
-          ev.To = formatDateTime(ev.From);
+          const rawFrom = ev.From;
+          const rawTo = ev.To;
+          ev.From = formatDateTime(rawFrom);
+          ev.To = formatDateTime(rawTo);
         })
 
 
@@ -193,18 +195,18 @@ const EventsPage = () => {
               placeholder="Search events..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border rounded px-4 py-2 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+              className="border border-gray-200 rounded-xl px-4 py-2.5 w-full sm:w-72 bg-white focus:border-[#F48F0F] focus:ring-1 focus:ring-[#F48F0F] outline-none shadow-sm transition"
               aria-label="Search events"
             />
-            <div className="flex gap-3">
+            <div className="flex gap-2 bg-orange-50/50 p-1.5 border border-orange-100/60 rounded-2xl">
               {["All", "Upcoming", "Past", "Ongoing"].map((label) => (
                 <button
                   key={label}
                   onClick={() => setFilter(label)}
-                  className={`px-4 py-2 rounded-full text-sm transition ${
+                  className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                     filter === label
-                      ? "bg-orange-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-[#F48F0F] text-white shadow-sm"
+                      : "text-gray-600 hover:text-[#F48F0F]"
                   }`}
                   aria-pressed={filter === label}
                 >
@@ -286,16 +288,16 @@ const EventsPage = () => {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100 transition"
+                className="w-10 h-10 border border-gray-200 rounded-xl disabled:opacity-40 hover:bg-orange-50 hover:border-[#F48F0F]/50 transition flex items-center justify-center cursor-pointer text-gray-600"
                 aria-label="Previous page"
               >
-                &lt;
+                &laquo;
               </button>
 
               {pageNumbers.map((num, idx) => {
                 if (num === "left-ellipsis" || num === "right-ellipsis") {
                   return (
-                    <span key={idx} className="px-3 py-1 select-none">
+                    <span key={idx} className="px-3 py-1 select-none text-gray-400 font-bold">
                       ...
                     </span>
                   );
@@ -305,10 +307,10 @@ const EventsPage = () => {
                     key={idx}
                     onClick={() => setPage(num)}
                     aria-current={page === num ? "page" : undefined}
-                    className={`px-3 py-1 border rounded transition ${
+                    className={`w-10 h-10 border rounded-xl font-semibold transition-all cursor-pointer flex items-center justify-center ${
                       page === num
-                        ? "bg-orange-500 text-white"
-                        : "hover:bg-gray-100"
+                        ? "bg-[#F48F0F] border-[#F48F0F] text-white shadow-md shadow-orange-500/20"
+                        : "border-gray-200 text-gray-700 bg-white hover:bg-orange-50 hover:border-[#F48F0F]/50"
                     }`}
                   >
                     {num}
@@ -319,10 +321,10 @@ const EventsPage = () => {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100 transition"
+                className="w-10 h-10 border border-gray-200 rounded-xl disabled:opacity-40 hover:bg-orange-50 hover:border-[#F48F0F]/50 transition flex items-center justify-center cursor-pointer text-gray-600"
                 aria-label="Next page"
               >
-                &gt;
+                &raquo;
               </button>
             </div>
           )}
