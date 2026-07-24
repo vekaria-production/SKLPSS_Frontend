@@ -16,16 +16,16 @@ export default function CommitteeTreeWithModal() {
   const [membersList, setMembersList] = useState([]);
   const [positionList, setPositionList] = useState([]);
   const [modalImgError, setModalImgError] = useState(false);
-
-  useEffect(() => {
-    setModalImgError(false);
-  }, [modalData]);
   const nodesRefs = useRef(new Map());
   const [lines, setLines] = useState([]);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [levels, setLevels] = useState([]);
+
+  useEffect(() => {
+    setModalImgError(false);
+  }, [modalData]);
 
   // Fetch data
   useEffect(() => {
