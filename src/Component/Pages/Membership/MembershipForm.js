@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Back from "../../UI/Back_button/Back";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const MembershipForm = () => {
   const navigate = useNavigate(); 
@@ -14,30 +15,31 @@ const MembershipForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const validate = () => {
-    
     const newErrors = {};
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const phoneRegex = /^[0-9]{10}$/;
+    // Allows 7 to 15 digits for international / Seychelles numbers
+    const phoneRegex = /^[0-9]{7,15}$/;
 
     if (!form.name.trim()) newErrors.name = "Name is required.";
     if (!form.email || !emailRegex.test(form.email))
       newErrors.email = "Valid email is required.";
     if (!form.mobileCode.trim()) newErrors.mobileCode = "Code is required.";
     if (!form.mobileNumber || !phoneRegex.test(form.mobileNumber))
-      newErrors.mobileNumber = "Enter a valid 10-digit number.";
+      newErrors.mobileNumber = "Enter a valid phone number (7-15 digits).";
     if (!form.gender) newErrors.gender = "Please select gender.";
     if (!form.dob) newErrors.dob = "Date of birth is required.";
 
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
 
@@ -46,9 +48,51 @@ const MembershipForm = () => {
       return;
     }
 
-    alert("Membership form submitted!");
-    navigate(-1);
-    // Add actual submission logic here
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Split full name into first and last name
+      const nameParts = form.name.trim().split(/\s+/);
+      const Fname = nameParts[0] || "";
+      const LName = nameParts.slice(1).join(" ") || "Samaj";
+
+      const genderCode = form.gender === "male" ? "M" : "F";
+      const fullContact = `${form.mobileCode}${form.mobileNumber}`;
+
+      // Build form data payload for FastAPI Form parameters
+      const payload = new FormData();
+      payload.append("Fname", Fname);
+      payload.append("LName", LName);
+      payload.append("Gender", genderCode);
+      payload.append("Dob", form.dob);
+      payload.append("Email", form.email);
+      payload.append("Contact", fullContact);
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_NETWORK}/registerGuest`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      alert(response.data.message || "Registration successful! Welcome to our community.");
+      navigate(-1);
+    } catch (error) {
+      console.error("Registration error:", error);
+      const serverMessage = error.response?.data?.detail;
+      // If Contact unique constraint check fails
+      if (serverMessage && (serverMessage.includes("unique") || serverMessage.includes("exists"))) {
+        setErrors({ mobileNumber: "This phone number is already registered." });
+      } else {
+        alert(serverMessage || "Registration failed. Please check your inputs and try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -188,9 +232,10 @@ const MembershipForm = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="bg-[#F48F0F] hover:bg-[#e1810c] text-white font-semibold w-full py-3 rounded-lg transition duration-200"
+            disabled={isSubmitting}
+            className="bg-[#F48F0F] hover:bg-[#e1810c] text-white font-semibold w-full py-3 rounded-lg transition duration-200 disabled:opacity-50 cursor-pointer"
           >
-            Submit
+            {isSubmitting ? "Registering..." : "Submit"}
           </button>
         </form>
       </div>

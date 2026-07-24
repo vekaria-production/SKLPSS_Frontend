@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../../assets/logo.png";
+import { Menu, X } from "lucide-react";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,93 +9,103 @@ function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="bg-[#FDF8F3] border-b border-[#E1D5C9] font-sans">
-      <div className="flex items-center justify-between flex-wrap md:flex-nowrap">
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <img
-            src={logo}
-            alt="Logo"
-            className="h-[8vw] max-h-20 min-h-[4rem] transition-all duration-300 pl-4"
-          />
-        </div>
+    <header className="bg-[#FDF8F3] border-b border-[#E1D5C9] font-sans sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link to="/">
+              <img
+                src={logo}
+                alt="SKLPSS Logo"
+                className="h-14 w-auto cursor-pointer"
+              />
+            </Link>
+          </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="ml-auto md:hidden pr-4">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-3xl font-bold text-[#292929]"
-          >
-            ☰
-          </button>
-        </div>
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex space-x-8 text-sm font-semibold tracking-wide">
+            {[
+              { label: "Home", path: "/" },
+              { label: "About", path: "/aboutUs" },
+              { label: "Gallery", path: "/Gallery" },
+              { label: "Education", path: "/Education" }
+            ].map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`transition-all duration-200 hover:text-[#F48F0F] relative py-1 ${
+                  location.pathname === item.path
+                    ? "text-[#F48F0F] font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#F48F0F]"
+                    : "text-[#292929]"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
-        {/* Nav Links */}
-        <nav
-          className={`w-full md:flex md:flex-1 md:justify-center md:items-center ${
-            isMenuOpen ? "flex flex-col items-center mt-4" : "hidden"
-          } md:flex-row md:mt-0 md:gap-6 text-[clamp(0.95rem,2vw,1.1rem)] font-medium tracking-wide`}
-        >
-          <Link
-            to="/"
-            className={`px-2 hover:underline underline-offset-4 rounded-md py-1 ${
-              location.pathname === "/"
-                ? "text-[#F48F0F] font-semibold"
-                : "text-[#292929]"
-            }`}
-          >
-            Home
-          </Link>
-
-          <Link
-            to="/aboutUs"
-            className={`px-2 hover:underline underline-offset-4 rounded-md py-1 ${
-              location.pathname === "/aboutUs"
-                ? "text-[#F48F0F] font-semibold"
-                : "text-[#292929]"
-            }`}
-          >
-            About
-          </Link>
-
-          <Link
-            to="/Gallery"
-            className={`px-2 hover:underline underline-offset-4 rounded-md py-1 ${
-              location.pathname === "/Gallery"
-                ? "text-[#F48F0F] font-semibold"
-                : "text-[#292929]"
-            }`}
-          >
-            Gallery
-          </Link>
-
-          <Link
-            to="/Education"
-            className={`px-2 hover:underline underline-offset-4 rounded-md py-1 ${
-              location.pathname === "/Education"
-                ? "text-[#F48F0F] font-semibold"
-                : "text-[#292929]"
-            }`}
-          >
-            Education
-          </Link>
-        </nav>
-
-        {/* Button */}
-        {/* <div className="hidden md:block md:ml-auto pr-4">
-          <button onClick={() => navigate("/Membership")} className="bg-[#F48F0F] text-[#292929] px-5 py-2 rounded-full font-semibold text-[clamp(1rem,2vw,1.05rem)] uppercase tracking-wider shadow hover:brightness-110 transition-all duration-200">
-            Become a member
-          </button>
-        </div> */}
-
-        {/* Mobile Button */}
-        {/* {isMenuOpen && (
-          <div className="w-full flex justify-center mt-4 md:hidden pb-4">
-            <button onClick={() => navigate("/Membership")} className="bg-[#F48F0F] text-[#292929] px-5 py-2 rounded-full font-semibold text-[clamp(0.9rem,2vw,1rem)] uppercase tracking-wide shadow hover:brightness-110 transition-all duration-200">
+          {/* Desktop Membership CTA */}
+          <div className="hidden md:block">
+            <button
+              onClick={() => navigate("/Membership")}
+              className="bg-[#F48F0F] hover:bg-[#e1810c] text-white font-bold px-6 py-2.5 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
+            >
               Become a member
             </button>
           </div>
-        )} */}
+
+          {/* Mobile Menu Toggle */}
+          <div className="flex md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-xl text-gray-700 hover:text-[#F48F0F] hover:bg-orange-50 focus:outline-none transition cursor-pointer"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Dropdown Menu */}
+      <div
+        className={`md:hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? "max-h-[350px] opacity-100 border-t border-orange-100" : "max-h-0 opacity-0 overflow-hidden"
+        }`}
+      >
+        <div className="px-4 pt-3 pb-6 space-y-2 bg-[#FDF8F3] shadow-inner text-center">
+          {[
+            { label: "Home", path: "/" },
+            { label: "About", path: "/aboutUs" },
+            { label: "Gallery", path: "/Gallery" },
+            { label: "Education", path: "/Education" }
+          ].map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsMenuOpen(false)}
+              className={`block px-4 py-2.5 rounded-xl text-base font-semibold transition-all ${
+                location.pathname === item.path
+                  ? "bg-orange-50 text-[#F48F0F]"
+                  : "text-gray-700 hover:bg-orange-50/50 hover:text-[#F48F0F]"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <div className="pt-4 border-t border-orange-100/50">
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/Membership");
+              }}
+              className="bg-[#F48F0F] hover:bg-[#e1810c] text-white font-bold w-full py-3 rounded-full text-sm uppercase tracking-wider shadow transition duration-300 cursor-pointer"
+            >
+              Become a member
+            </button>
+          </div>
+        </div>
       </div>
     </header>
   );
