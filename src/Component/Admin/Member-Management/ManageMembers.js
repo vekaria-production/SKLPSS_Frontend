@@ -16,6 +16,11 @@ const ManageMembers = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedCardMember, setSelectedCardMember] = useState(null);
 
+  const [showArrangeModal, setShowArrangeModal] = useState(false);
+  const [localPositions, setLocalPositions] = useState([]);
+  const [cutoffId, setCutoffId] = useState("");
+  const [savingPositions, setSavingPositions] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [contactFilter, setContactFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
@@ -53,9 +58,103 @@ const ManageMembers = () => {
   const debouncedContactFilter = useDebounce(contactFilter, 400);
   const debouncedEmailFilter = useDebounce(emailFilter, 400);
 
-  const { position = [] } = useOptions();
+  const { position = [], refresh } = useOptions();
 
   const designationOptions = position.filter((p) => p[0] !== 6).map((p) => p[0]);
+
+  useEffect(() => {
+    if (showArrangeModal) {
+      const mapped = position.map(([id, name, parentId, sortOrder = 0, isVisible = true]) => ({
+        Id: id,
+        Name: name,
+        Parent: parentId,
+        SortOrder: sortOrder,
+        IsVisible: isVisible
+      })).sort((a, b) => a.SortOrder - b.SortOrder);
+      
+      setLocalPositions(mapped);
+      
+      const visiblePositions = mapped.filter(p => p.IsVisible);
+      if (visiblePositions.length > 0) {
+        setCutoffId(visiblePositions[visiblePositions.length - 1].Id);
+      } else {
+        setCutoffId("");
+      }
+    }
+  }, [showArrangeModal, position]);
+
+  const handleShiftUp = (index) => {
+    if (index === 0) return;
+    const newList = [...localPositions];
+    const temp = newList[index];
+    newList[index] = newList[index - 1];
+    newList[index - 1] = temp;
+    
+    const updated = newList.map((p, i) => ({ ...p, SortOrder: i + 1 }));
+    setLocalPositions(updated);
+  };
+
+  const handleShiftDown = (index) => {
+    if (index === localPositions.length - 1) return;
+    const newList = [...localPositions];
+    const temp = newList[index];
+    newList[index] = newList[index + 1];
+    newList[index + 1] = temp;
+    
+    const updated = newList.map((p, i) => ({ ...p, SortOrder: i + 1 }));
+    setLocalPositions(updated);
+  };
+
+  const handleCutoffChange = (selectedId) => {
+    setCutoffId(selectedId);
+    if (!selectedId) {
+      setLocalPositions(prev => prev.map(p => ({ ...p, IsVisible: false })));
+      return;
+    }
+    const cutoffIndex = localPositions.findIndex(p => p.Id === Number(selectedId));
+    const updated = localPositions.map((p, i) => ({
+      ...p,
+      IsVisible: i <= cutoffIndex
+    }));
+    setLocalPositions(updated);
+  };
+
+  const handleToggleVisible = (id) => {
+    const updated = localPositions.map(p => {
+      if (p.Id === id) {
+        return { ...p, IsVisible: !p.IsVisible };
+      }
+      return p;
+    });
+    setLocalPositions(updated);
+  };
+
+  const handleSavePositions = async () => {
+    setSavingPositions(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_NETWORK}/updatePositionList`,
+        localPositions.map(p => ({
+          Id: p.Id,
+          SortOrder: p.SortOrder,
+          IsVisible: p.IsVisible
+        })),
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+      
+      refresh("PositionList");
+      setShowArrangeModal(false);
+    } catch (error) {
+      console.error("Error updating designations:", error);
+      alert("Failed to save designations. Please try again.");
+    } finally {
+      setSavingPositions(false);
+    }
+  };
   const genderOptions = ["M", "F"];
 
   const getPositionName = (id) => {
@@ -170,12 +269,20 @@ const ManageMembers = () => {
       <div className="w-full bg-[#FDF8F3] p-2 pb-0 min-h-[550px]">
         <div className="flex justify-between items-center mb-6 ">
           <h1 className="text-2xl font-semibold">Member Management</h1>
-          <button
-            onClick={handleAddClick}
-            className="bg-[#F48F0F] text-white md:px-4 px-2 py-1 md:py-2 rounded-xl hover:opacity-90"
-          >
-            Add New Member
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowArrangeModal(true)}
+              className="border border-[#F48F0F] text-[#F48F0F] bg-white md:px-4 px-2 py-1 md:py-2 rounded-xl hover:bg-[#fff4e0] transition-colors font-medium text-sm cursor-pointer"
+            >
+              Arrange Designations
+            </button>
+            <button
+              onClick={handleAddClick}
+              className="bg-[#F48F0F] text-white md:px-4 px-2 py-1 md:py-2 rounded-xl hover:opacity-90 transition-opacity font-medium text-sm cursor-pointer"
+            >
+              Add New Member
+            </button>
+          </div>
         </div>
 
         {/* Settings */}
@@ -495,6 +602,107 @@ const ManageMembers = () => {
                   className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 px-4 rounded-xl transition-all text-sm cursor-pointer"
                 >
                   Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showArrangeModal && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl text-[#292929]">
+              <div className="flex justify-between items-center pb-3 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-gray-800">Arrange Designations & Visibility</h2>
+                <button
+                  onClick={() => setShowArrangeModal(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer"
+                >
+                  &times;
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto py-4 space-y-4">
+                {/* Visibility Cutoff Dropdown */}
+                <div className="bg-orange-50/50 border border-[#F48F0F]/20 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-[#F48F0F]">Front Page Visibility Cutoff</h3>
+                    <p className="text-xs text-gray-500 mt-0.5 font-normal">Select the lowest designation that should be visible on the public committee tree.</p>
+                  </div>
+                  <select
+                    value={cutoffId}
+                    onChange={(e) => handleCutoffChange(e.target.value)}
+                    className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:border-[#F48F0F] outline-none min-w-[200px]"
+                  >
+                    <option value="">None (Hide All)</option>
+                    {localPositions.map(p => (
+                      <option key={p.Id} value={p.Id}>{p.Name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* List Table */}
+                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                  <table className="w-full text-sm border-collapse text-left">
+                    <thead className="bg-[#EDE4DC] text-[#292929]">
+                      <tr>
+                        <th className="px-4 py-2.5 font-bold">Designation</th>
+                        <th className="px-4 py-2.5 font-bold text-center w-[120px]">Order</th>
+                        <th className="px-4 py-2.5 font-bold text-center w-[120px]">Visible</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                      {localPositions.map((p, idx) => (
+                        <tr key={p.Id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3 font-medium text-gray-800">{p.Name}</td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex justify-center items-center gap-1.5">
+                              <button
+                                onClick={() => handleShiftUp(idx)}
+                                disabled={idx === 0}
+                                className="w-7 h-7 rounded bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-30 disabled:hover:bg-gray-100 flex items-center justify-center text-xs font-bold transition-all cursor-pointer"
+                                title="Move Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                onClick={() => handleShiftDown(idx)}
+                                disabled={idx === localPositions.length - 1}
+                                className="w-7 h-7 rounded bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-30 disabled:hover:bg-gray-100 flex items-center justify-center text-xs font-bold transition-all cursor-pointer"
+                                title="Move Down"
+                              >
+                                ▼
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <input
+                              type="checkbox"
+                              checked={p.IsVisible}
+                              onChange={() => handleToggleVisible(p.Id)}
+                              className="accent-[#F48F0F] w-4.5 h-4.5 cursor-pointer"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowArrangeModal(false)}
+                  disabled={savingPositions}
+                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSavePositions}
+                  disabled={savingPositions}
+                  className="bg-[#F48F0F] hover:bg-[#dc7d00] text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer"
+                >
+                  {savingPositions ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>

@@ -47,7 +47,7 @@ export default function CommitteeTreeWithModal() {
         setMembersList(membersData);
         console.log("Members Data:", membersData);
         // Use the position from useOptions, map to objects
-        setPositionList(position.map(([id, name, parentId]) => ({ id, name, parentId })));
+        setPositionList(position.map(([id, name, parentId, sortOrder = 0, isVisible = true]) => ({ id, name, parentId, sortOrder, isVisible })));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -65,8 +65,8 @@ export default function CommitteeTreeWithModal() {
   }, [positionList, membersList]);
 
   function buildTree(positions, members) {
-    // Filter out the "Member" position (ID 5)
-    const filteredPositions = positions.filter(p => p.id !== 5);
+    // Filter out the "Member" position (ID 5) and hidden positions
+    const filteredPositions = positions.filter(p => p.id !== 5 && p.isVisible !== false);
     const posMap = new Map(filteredPositions.map(p => [p.id, p]));
     const memMap = new Map();
     members.forEach(m => {
