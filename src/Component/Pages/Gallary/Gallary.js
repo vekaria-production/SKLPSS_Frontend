@@ -4,7 +4,7 @@ import Footer from "../../UI/Footer/Footer";
 import LoadingSpinner from "../../UI/LoadingSpiner/LoadingSpinner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {getDriveImageUrl} from "./../../../utils/getGoogleDriveImage"
+import LazyImage from "../../UI/LazyImage/LazyImage";
 function Gallery() {
   const navigate = useNavigate();
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -21,7 +21,7 @@ function Gallery() {
     if (categoryFilter === "all") return events;
     
     return events.filter((event) => event.CategoryID === categoryFilter);
-  }, [categoryFilter]);
+  }, [categoryFilter, events]);
 
   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
 
@@ -177,11 +177,13 @@ function Gallery() {
                 }}
                 className="rounded-xl shadow bg-white overflow-hidden hover:shadow-lg transform hover:scale-[1.03] transition duration-300 ease-in-out cursor-pointer"
               >
-                <img
-                  src={event.Poster}
-                  alt={event.Name}
-                  className="w-full h-48 object-cover"
-                />
+                <div className="w-full h-48 flex-shrink-0">
+                  <LazyImage
+                    src={event.Poster}
+                    alt={event.Name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div className="p-4">
                   <h3 className="font-semibold mb-1">{event.Name}</h3>
                   <p className="text-sm text-gray-600">
