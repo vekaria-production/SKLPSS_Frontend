@@ -8,6 +8,7 @@ import DeleteConfirmation from "../reusable/DeleteConfirmation";
 import axios from "axios";
 import { CircleCheckBig, Clock, TicketCheck, Users } from "lucide-react";
 import useDebounce from "../../../hooks/useDebounce";
+import { useAuth } from "../../../Context/Auth/AuthContext";
 
 
 async function getEventsData({ offset = 0, limit = 100, search, category, status, fromDate, toDate } = {}) {
@@ -37,6 +38,9 @@ async function getEventsData({ offset = 0, limit = 100, search, category, status
 
 
 const ManageEvents = () => {
+  const { permissions } = useAuth();
+  const hasPermission = (field) => permissions.includes(field);
+
   // State for user modal and registered users
   const [showUserModal, setShowUserModal] = useState(false);
   const [registeredUsers, setRegisteredUsers] = useState([]);
@@ -367,12 +371,14 @@ const ManageEvents = () => {
                   onClick={() => showUser(event.ID)}
                   title="Show Registered Users"
                 />
-                <FaLink
-                  size={18}
-                  className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
-                  onClick={() => setShareEventId(event.ID)}
-                  title="Generate shareable image upload link"
-                />
+                {hasPermission("share_gallery") && (
+                  <FaLink
+                    size={18}
+                    className="text-[#F48F0F] hover:text-[#dc7d00] cursor-pointer transition-colors"
+                    onClick={() => setShareEventId(event.ID)}
+                    title="Generate shareable image upload link"
+                  />
+                )}
                 {/* Registered Users Modal */}
                 {showUserModal && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

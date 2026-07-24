@@ -26,17 +26,16 @@ const AddRoleModal = ({ role, onClose, onSave }) => {
       },
     }));
   };
-
   const handleSave = () => {
     if (!roleName.trim()) {
       alert("Role name is required");
       return;
     }
 
-    // Convert {events: {view:true}} → ["view_events"]
     const permissionList = [];
     for (const module of modules) {
-      for (const action of actions) {
+      const allActions = module === "gallery" ? [...actions, "share", "post"] : actions;
+      for (const action of allActions) {
         if (permissions[module]?.[action]) {
           permissionList.push(`${action}_${module}`);
         }
@@ -49,7 +48,7 @@ const AddRoleModal = ({ role, onClose, onSave }) => {
     };
 
     console.log("Saving role payload:", payload);
-    onSave(payload);  // delegate to parent (Settings)
+    onSave(payload);
     onClose();
   };
 
@@ -77,6 +76,8 @@ const AddRoleModal = ({ role, onClose, onSave }) => {
                 {actions.map((action) => (
                   <th key={action} className="px-3 py-2 capitalize">{action}</th>
                 ))}
+                <th className="px-3 py-2 capitalize">Share</th>
+                <th className="px-3 py-2 capitalize">Post</th>
               </tr>
             </thead>
             <tbody>
@@ -95,6 +96,32 @@ const AddRoleModal = ({ role, onClose, onSave }) => {
                       />
                     </td>
                   ))}
+                  {/* Share Column */}
+                  <td className="text-center">
+                    {module === "gallery" ? (
+                      <input
+                        type="checkbox"
+                        checked={permissions[module]?.["share"] || false}
+                        onChange={() => handleCheckboxChange(module, "share")}
+                        className="accent-[#F48F0F]"
+                      />
+                    ) : (
+                      <span className="text-gray-300">-</span>
+                    )}
+                  </td>
+                  {/* Post Column */}
+                  <td className="text-center">
+                    {module === "gallery" ? (
+                      <input
+                        type="checkbox"
+                        checked={permissions[module]?.["post"] || false}
+                        onChange={() => handleCheckboxChange(module, "post")}
+                        className="accent-[#F48F0F]"
+                      />
+                    ) : (
+                      <span className="text-gray-300">-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -4,6 +4,7 @@ import SidebarLayout from "../reusable/SidebarLayout";
 import axios from "axios";
 import { compressImages } from "../reusable/ImageCompressor";
 import { FaCheck, FaTimes, FaTrash, FaClock } from "react-icons/fa";
+import { useAuth } from "../../../Context/Auth/AuthContext";
 
 const uploadImages = async (files, Id) => {
   const formData = new FormData();
@@ -44,6 +45,9 @@ const StatusBadge = ({ approved }) => {
 };
 
 const ManagePhotos = () => {
+  const { permissions } = useAuth();
+  const hasPermission = (field) => permissions.includes(field);
+
   const { Id } = useParams();
   const [photos, setPhotos] = useState([]); // [{Id, Link, Approved}]
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -249,37 +253,41 @@ const ManagePhotos = () => {
             </p>
           </div>
           <div className="flex gap-3 flex-wrap">
-            <button
-              onClick={() => {
-                if (selectedPhotos.length === 0) {
-                  alert("Please select at least one image to post on Facebook.");
-                  return;
-                }
-                setShowFacebookModal(true);
-              }}
-              className="bg-[#1877F2] hover:bg-[#166FE5] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-              Share on Facebook ({selectedPhotos.length})
-            </button>
+            {hasPermission("share_gallery") && (
+              <button
+                onClick={() => {
+                  if (selectedPhotos.length === 0) {
+                    alert("Please select at least one image to post on Facebook.");
+                    return;
+                  }
+                  setShowFacebookModal(true);
+                }}
+                className="bg-[#1877F2] hover:bg-[#166FE5] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
+              >
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Share on Facebook ({selectedPhotos.length})
+              </button>
+            )}
 
-            <label
-              className={`flex-shrink-0 bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-colors ${
-                isLoading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {isLoading ? "Uploading..." : "+ Add Photos"}
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                className="hidden"
-                onChange={handleAddPhotos}
-                disabled={isLoading}
-              />
-            </label>
+            {hasPermission("post_gallery") && (
+              <label
+                className={`flex-shrink-0 bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-colors ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {isLoading ? "Uploading..." : "+ Add Photos"}
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAddPhotos}
+                  disabled={isLoading}
+                />
+              </label>
+            )}
           </div>
         </div>
 
@@ -308,20 +316,22 @@ const ManagePhotos = () => {
                   }`}
                 >
                   {/* Select Checkbox (Overlay top-right) */}
-                  <div className="absolute top-2 right-2 z-10 flex items-center justify-center">
-                    <input
-                      type="checkbox"
-                      className="w-5 h-5 accent-[#1877F2] cursor-pointer rounded border-gray-300 focus:ring-[#1877F2]"
-                      checked={selectedPhotos.includes(photo.Link)}
-                      onChange={() => {
-                        if (selectedPhotos.includes(photo.Link)) {
-                          setSelectedPhotos(selectedPhotos.filter((link) => link !== photo.Link));
-                        } else {
-                          setSelectedPhotos([...selectedPhotos, photo.Link]);
-                        }
-                      }}
-                    />
-                  </div>
+                  {hasPermission("share_gallery") && (
+                    <div className="absolute top-2 right-2 z-10 flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 accent-[#1877F2] cursor-pointer rounded border-gray-300 focus:ring-[#1877F2]"
+                        checked={selectedPhotos.includes(photo.Link)}
+                        onChange={() => {
+                          if (selectedPhotos.includes(photo.Link)) {
+                            setSelectedPhotos(selectedPhotos.filter((link) => link !== photo.Link));
+                          } else {
+                            setSelectedPhotos([...selectedPhotos, photo.Link]);
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
                   {/* Image */}
                   <div
                     className="aspect-square cursor-zoom-in"

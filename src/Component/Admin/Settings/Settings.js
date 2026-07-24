@@ -235,11 +235,17 @@ const Settings = () => {
     {
       key: "modules",
       label: "Modules Access",
-      render: (_, row) =>
-        Object.entries(row.permissions)
+      render: (_, row) => {
+        const modulesList = Object.entries(row.permissions)
           .filter(([, perms]) => Object.values(perms).some(Boolean))
           .map(([mod]) => mod.charAt(0).toUpperCase() + mod.slice(1))
-          .join(", "),
+          .join(", ");
+        return (
+          <div className="truncate max-w-[200px]" title={modulesList}>
+            {modulesList}
+          </div>
+        );
+      },
     },
   ];
 
