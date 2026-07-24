@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-const events = [
-  { month: 'MAY', day: '10' },
-  { month: 'JULY', day: '10' },
-  { month: 'MON', day: 'DD' },
-];
+
 function getMonthName(dateString) {
   const date = new Date(dateString);
   // Using 'en-US' locale and 'long' month format for full month name
@@ -20,7 +16,7 @@ function getDay(dateString) {
 
 export default function Events() {
   const [events, setEvents] = useState([]);
-  const currentDate = new Date();
+
   
   useEffect(() => {
   
@@ -40,7 +36,8 @@ export default function Events() {
             data = JSON.parse(data).events;
           }
           
-          data.map((ev) => {
+          const currentDate = new Date();
+          data.forEach((ev) => {
             const fromDate = new Date(ev.From);
             const toDate = new Date(ev.To);
 
@@ -79,7 +76,7 @@ export default function Events() {
 
       <div className="flex flex-col gap-8">
         {events
-        .filter((ev) => ev.status == "Upcoming")
+        .filter((ev) => ev.status === "Upcoming")
         .map((event, idx) => (
           <div
             key={idx}

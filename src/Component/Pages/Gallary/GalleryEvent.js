@@ -213,7 +213,7 @@ const GalleryEvent = () => {
           <div className="max-w-[85vw] max-h-[85vh] flex flex-col items-center justify-center">
             <img
               src={photos[photoIndex]}
-              alt={`Photo ${photoIndex + 1}`}
+              alt={`Event slide ${photoIndex + 1}`}
               className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl select-none"
             />
             <span className="text-white/80 text-sm font-semibold mt-4 bg-black/40 px-3 py-1 rounded-full">

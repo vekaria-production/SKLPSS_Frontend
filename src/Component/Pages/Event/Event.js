@@ -7,7 +7,7 @@ import LoadingSpinner from "../../UI/LoadingSpiner/LoadingSpinner";
 import ContactModal from "../../UI/ContactModal/ContactModal"; // 👈 You need to create this modal
 import axios from "axios";
 import LazyImage from "../../UI/LazyImage/LazyImage";
-import { getDriveImageUrl } from "../../../utils/getGoogleDriveImage";
+
 
 const statusClasses = {
   upcoming: "bg-blue-100 text-blue-500",
@@ -66,7 +66,7 @@ const EventsPage = () => {
   const [fadeIn, setFadeIn] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEventTitle, setSelectedEventTitle] = useState("");
-  const currentDate = new Date();
+
   // const [filteredEvents, setFilteredEvents] = useState([]);
 
   const filteredEvents = useMemo(() => {
@@ -139,7 +139,8 @@ const EventsPage = () => {
             data = JSON.parse(data).events;
           }
         
-        data.map((ev) => {
+        const currentDate = new Date();
+        data.forEach((ev) => {
           const fromDate = new Date(ev.From);
           const toDate = new Date(ev.To);
 

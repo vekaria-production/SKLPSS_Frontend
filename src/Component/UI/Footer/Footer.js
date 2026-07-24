@@ -49,7 +49,7 @@ function Footer() {
           {/* Social Icons */}
           <div className="flex gap-4 text-[#292929]">
             <a href="https://www.facebook.com/SKLPSS/" target="_blank" rel="noopener noreferrer" className="hover:text-[#F48F0F] transition duration-200 bg-white border border-[#E1D5C9] p-2.5 rounded-full hover:shadow shadow-sm flex items-center justify-center cursor-pointer" aria-label="Facebook"><Facebook size={18} /></a>
-            <a href="#" className="hover:text-[#F48F0F] transition duration-200 bg-white border border-[#E1D5C9] p-2.5 rounded-full hover:shadow shadow-sm flex items-center justify-center cursor-pointer" aria-label="Instagram"><Instagram size={18} /></a>
+            <a href="https://www.instagram.com/sklps_seychelles/" target="_blank" rel="noopener noreferrer" className="hover:text-[#F48F0F] transition duration-200 bg-white border border-[#E1D5C9] p-2.5 rounded-full hover:shadow shadow-sm flex items-center justify-center cursor-pointer" aria-label="Instagram"><Instagram size={18} /></a>
           </div>
 
           {/* Scroll to top */}
