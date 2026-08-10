@@ -81,6 +81,7 @@ const ManageGuests = () => {
     setFormData({
       membership_id: generateNewId(),
       Fname: "",
+      MName: "",
       LName: "",
       Dob: "",
       Gender: "M",
@@ -88,6 +89,9 @@ const ManageGuests = () => {
       Email: "",
       Position: 6, // Fixed to Guest position ID
       BloodGroup: "",
+      Address: "",
+      Village: "",
+      Occupation: "",
     });
   };
 
@@ -251,6 +255,7 @@ const ManageGuests = () => {
           ]}
           rows={filteredMembers.map((m) => ({
             ...m,
+            Fname: [m.Fname, m.MName, m.LName].filter(Boolean).join(" "),
             Gender: m.Gender === "M" ? "Male" : m.Gender === "F" ? "Female" : "Other",
             Position: getPositionName(m.Position),
             actions: (

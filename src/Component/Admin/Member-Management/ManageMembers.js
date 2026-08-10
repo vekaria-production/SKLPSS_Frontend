@@ -231,6 +231,7 @@ const ManageMembers = () => {
     setFormData({
       membership_id: generateNewId(),
       Fname: "",
+      MName: "",
       LName: "",
       Dob: "",
       Gender: "M",
@@ -238,6 +239,9 @@ const ManageMembers = () => {
       Email: "",
       Position: "",
       BloodGroup: "",
+      Address: "",
+      Village: "",
+      Occupation: "",
     });
   };
 
@@ -407,6 +411,7 @@ const ManageMembers = () => {
 
           rows={filteredMembers.map((m) => ({
             ...m,
+            Fname: [m.Fname, m.MName, m.LName].filter(Boolean).join(" "),
             Gender: m.Gender === "M" ? "Male" : m.Gender === "F" ? "Female" : "Other",
             Position: getPositionName(m.Position),
             actions: (

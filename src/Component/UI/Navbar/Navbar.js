@@ -46,14 +46,14 @@ function Navbar() {
           </nav>
 
           {/* Desktop Membership CTA */}
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <button
               onClick={() => navigate("/Membership")}
               className="bg-[#F48F0F] hover:bg-[#e1810c] text-white font-bold px-6 py-2.5 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
             >
               Become a member
             </button>
-          </div>
+          </div> */}
 
           {/* Mobile Menu Toggle */}
           <div className="flex md:hidden">
@@ -94,7 +94,7 @@ function Navbar() {
               {item.label}
             </Link>
           ))}
-          <div className="pt-4 border-t border-orange-100/50">
+          {/* <div className="pt-4 border-t border-orange-100/50">
             <button
               onClick={() => {
                 setIsMenuOpen(false);
@@ -104,7 +104,7 @@ function Navbar() {
             >
               Become a member
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </header>

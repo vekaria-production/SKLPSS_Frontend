@@ -65,7 +65,7 @@ const EventsPage = () => {
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedEventTitle, setSelectedEventTitle] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   // const [filteredEvents, setFilteredEvents] = useState([]);
 
@@ -116,7 +116,7 @@ const EventsPage = () => {
       const encodedTitle = encodeURIComponent(event.Name.replace(/\s+/g, "_"));
       navigate(`/Gallery/${event.ID}/${encodedTitle}`, {state: { event}} );
     } else if (event.status === "Upcoming") {
-      setSelectedEventTitle(event.Name);
+      setSelectedEvent(event);
       setModalOpen(true);
     }
   };
@@ -334,7 +334,7 @@ const EventsPage = () => {
 
       <ContactModal
         isOpen={modalOpen}
-        eventTitle={selectedEventTitle}
+        event={selectedEvent}
         onClose={() => setModalOpen(false)}
       />
 

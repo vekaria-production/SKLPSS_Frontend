@@ -28,11 +28,11 @@ export default function Banner() {
     </p>
 
     <div className="mt-8 flex flex-wrap justify-center gap-4">
-      <Link to="/Membership">
+      {/* <Link to="/Membership">
         <button className="bg-[#F48F0F] hover:bg-[#e1810c] text-white font-bold px-8 py-3 rounded-full transition duration-300 shadow-md hover:shadow-lg cursor-pointer">
           Join Our Community
         </button>
-      </Link>
+      </Link> */}
       <Link to="/aboutUs">
         <button className="bg-transparent border border-white text-white hover:bg-white hover:text-[#292929] font-bold px-8 py-3 rounded-full transition duration-300 cursor-pointer">
           Learn More

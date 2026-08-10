@@ -16,6 +16,9 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
   // console.log("Positions from useOptions:", position);
   const [preview, setPreview] = useState(null);
   const [modalIsGuest, setModalIsGuest] = useState(isGuest);
+  const [countryCode, setCountryCode] = useState("+248");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -26,7 +29,38 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
     setErrors({});
   }, [formData]);
 
- 
+  useEffect(() => {
+    if (formData?.Contact) {
+      const contactStr = String(formData.Contact).trim();
+      if (contactStr.startsWith("+91")) {
+        setCountryCode("+91");
+        setPhoneNumber(contactStr.slice(3).trim());
+      } else if (contactStr.startsWith("91") && contactStr.length === 12) {
+        setCountryCode("+91");
+        setPhoneNumber(contactStr.slice(2).trim());
+      } else if (contactStr.startsWith("+248")) {
+        setCountryCode("+248");
+        setPhoneNumber(contactStr.slice(4).trim());
+      } else if (contactStr.startsWith("248") && contactStr.length === 10) {
+        setCountryCode("+248");
+        setPhoneNumber(contactStr.slice(3).trim());
+      } else {
+        setCountryCode("+248");
+        setPhoneNumber(contactStr);
+      }
+    } else {
+      setCountryCode("+248");
+      setPhoneNumber("");
+    }
+  }, [formData?.Contact]);
+
+  const handlePhoneChange = (newCode, newNumber) => {
+    setCountryCode(newCode);
+    setPhoneNumber(newNumber);
+    const cleanNum = newNumber.trim();
+    const fullContact = cleanNum ? `${newCode}${cleanNum}` : "";
+    setFormData((prev) => ({ ...prev, Contact: fullContact }));
+  };
 
   if (!formData) return null;
 
@@ -34,8 +68,21 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
     const newErrors = {};
     if (!formData.Fname?.trim()) newErrors.Fname = "First name is required.";
     if (!formData.LName?.trim()) newErrors.LName = "Last name is required.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.Email || "")) newErrors.Email = "Invalid email.";
-    if (!/^[2-5]\d{6}$/.test(formData.Contact || "")) newErrors.Contact = "Use a 7-digit Seychelles mobile number.";
+    if (formData.Email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.Email || "")) {
+      newErrors.Email = "Invalid email.";
+    }
+
+    const cleanPhone = (phoneNumber || "").trim().replace(/\D/g, "");
+    if (!cleanPhone) {
+      newErrors.Contact = "Mobile number is required.";
+    } else if (countryCode === "+248" && cleanPhone.length !== 7) {
+      newErrors.Contact = "Use a 7-digit Seychelles mobile number.";
+    } else if (countryCode === "+91" && cleanPhone.length !== 10) {
+      newErrors.Contact = "Use a 10-digit Indian mobile number.";
+    } else if (cleanPhone.length < 5 || cleanPhone.length > 15) {
+      newErrors.Contact = "Invalid mobile number length.";
+    }
+
     if (!formData.Gender) newErrors.Gender = "Gender is required.";
     if (!formData.Dob) newErrors.Dob = "Date of birth is required.";
     if (!formData.Position) newErrors.Position = "Designation is required.";
@@ -55,7 +102,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
 
     // Normalize values for backend
     const genderValue =
-      formData.Gender === "M" || formData.Gender === "F" ? formData.Gender : "X";
+      formData.Gender === "M" || formData.Gender === "F" ? formData.Gender : null;
     const positionValue = formData.Position ? Number(formData.Position) : null;
 
     // Append fields
@@ -66,6 +113,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
     };
 
     appendIfValid("Fname", formData.Fname);
+    appendIfValid("MName", formData.MName);
     appendIfValid("LName", formData.LName);
     appendIfValid("Gender", genderValue);
     appendIfValid("Dob", new Date(formData.Dob).toISOString().slice(0, 10));
@@ -73,6 +121,9 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
     appendIfValid("Email", formData.Email);
     appendIfValid("Contact", formData.Contact);
     appendIfValid("BloodGroup", formData.BloodGroup);
+    appendIfValid("Address", formData.Address);
+    appendIfValid("Village", formData.Village);
+    appendIfValid("Occupation", formData.Occupation);
 
     // File upload (only if present)
     if (formData.Image instanceof File) {
@@ -127,8 +178,8 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
 
         <div className="space-y-4">
 
-          {/* First & Last Name */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* First, Middle & Last Name */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium">First Name</label>
               <input
@@ -139,6 +190,18 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
                 className="w-full border rounded px-3 py-2 text-sm"
               />
               {errors.Fname && <p className="text-red-500 text-sm">{errors.Fname}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Middle Name</label>
+              <input
+                name="MName"
+                type="text"
+                value={formData.MName || ""}
+                onChange={handleChange}
+                placeholder="Optional"
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
             </div>
 
             <div>
@@ -171,29 +234,31 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
           <div>
             <label className="block text-sm font-medium">Mobile Number</label>
             <div className="flex gap-2 items-center">
+              <select
+                value={countryCode}
+                onChange={(e) => handlePhoneChange(e.target.value, phoneNumber)}
+                className="bg-gray-100 border rounded px-3 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#F48F0F] cursor-pointer"
+              >
+                <option value="+248">🇸🇨 +248</option>
+                <option value="+91">🇮🇳 +91</option>
+              </select>
               <input
+                name="ContactNumber"
                 type="text"
-                value="+248"
-                disabled
-                className="w-16 bg-gray-100 border rounded px-3 py-2 text-sm"
-              />
-              <input
-                name="Contact"
-                type="text"
-                value={formData.Contact || ""}
-                onChange={handleChange}
-                placeholder="7-digit number"
-                className="flex-1 border rounded px-3 py-2 text-sm"
+                value={phoneNumber}
+                onChange={(e) => handlePhoneChange(countryCode, e.target.value)}
+                placeholder={countryCode === "+248" ? "7-digit number" : "10-digit number"}
+                className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F48F0F]"
               />
             </div>
-            {errors.Contact && <p className="text-red-500 text-sm">{errors.Contact}</p>}
+            {errors.Contact && <p className="text-red-500 text-sm mt-1">{errors.Contact}</p>}
           </div>
 
           {/* Gender */}
           <div>
             <label className="block text-sm font-medium">Gender</label>
             <div className="flex gap-4 mt-1">
-              {["M", "F", "X"].map((g) => (
+              {["M", "F"].map((g) => (
                 <label key={g} className="flex items-center gap-1 text-sm">
                   <input
                     type="radio"
@@ -202,7 +267,7 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
                     checked={formData.Gender === g}
                     onChange={handleChange}
                   />
-                  {g === "M" ? "Male" : g === "F" ? "Female" : "Other"}
+                  {g === "M" ? "Male" : "Female"}
                 </label>
               ))}
             </div>
@@ -267,20 +332,61 @@ const MemberModal = ({ mode, formData, setFormData, onCancel, onSave, isGuest })
             </div>
           )}
 
-          {/* Blood Group */}
-          <div>
-            <label className="block text-sm font-medium">Blood Group</label>
-            <select
-              name="BloodGroup"
-              value={formData.BloodGroup || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2 text-sm"
-            >
-              <option value="">Select Blood Group</option>
-              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
-                <option key={bg} value={bg}>{bg}</option>
-              ))}
-            </select>
+          {/* Blood Group & Occupation */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium">Blood Group</label>
+              <select
+                name="BloodGroup"
+                value={formData.BloodGroup || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2 text-sm"
+              >
+                <option value="">Select Blood Group</option>
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
+                  <option key={bg} value={bg}>{bg}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Occupation</label>
+              <input
+                name="Occupation"
+                type="text"
+                value={formData.Occupation || ""}
+                onChange={handleChange}
+                placeholder="Enter occupation"
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Local Address & Village */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium">Local Address</label>
+              <input
+                name="Address"
+                type="text"
+                value={formData.Address || ""}
+                onChange={handleChange}
+                placeholder="Enter local address"
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Village</label>
+              <input
+                name="Village"
+                type="text"
+                value={formData.Village || ""}
+                onChange={handleChange}
+                placeholder="Enter village"
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+            </div>
           </div>
 
           {/* Image Upload */}
