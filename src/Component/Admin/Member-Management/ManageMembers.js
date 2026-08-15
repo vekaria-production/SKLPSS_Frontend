@@ -236,11 +236,14 @@ const ManageMembers = () => {
       Dob: "",
       Gender: "M",
       Contact: "",
+      OfficeNumber: "",
       Email: "",
       Position: "",
       BloodGroup: "",
       Address: "",
       Village: "",
+      Island: "",
+      District: "",
       Occupation: "",
     });
   };

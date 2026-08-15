@@ -86,11 +86,14 @@ const ManageGuests = () => {
       Dob: "",
       Gender: "M",
       Contact: "",
+      OfficeNumber: "",
       Email: "",
       Position: 6, // Fixed to Guest position ID
       BloodGroup: "",
       Address: "",
       Village: "",
+      Island: "",
+      District: "",
       Occupation: "",
     });
   };
