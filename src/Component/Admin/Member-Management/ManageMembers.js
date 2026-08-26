@@ -574,13 +574,15 @@ const ManageMembers = () => {
                   box-shadow: none !important;
                   border: 1px solid #F48F0F !important;
                   background: #FFFDF9 !important;
+                  width: 320px !important;
+                  height: 480px !important;
                 }
               }
             `}</style>
             
-            <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border border-gray-100 flex flex-col items-center">
+            <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 flex flex-col items-center">
               {/* ID Card Render Area */}
-              <div className="print-card-container w-[320px] h-[480px] rounded-3xl overflow-hidden shadow-xl flex justify-center items-center">
+              <div className="print-card-container w-[400px] h-[600px] rounded-3xl overflow-hidden shadow-xl flex justify-center items-center">
                 <img
                   src={`${process.env.REACT_APP_NETWORK}/get_member_card/${selectedCardMember.Id}?format=png`}
                   alt="Member ID Card"
