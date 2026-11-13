@@ -14,6 +14,7 @@ const ManageGuests = () => {
   const [mode, setMode] = useState(""); 
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [modalIsGuest, setModalIsGuest] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [contactFilter, setContactFilter] = useState("");
@@ -117,15 +118,27 @@ const ManageGuests = () => {
 
   const handleSaveForm = (savedData) => {
     const dataToSave = savedData || formData;
-    if (mode === "edit") {
-      const updated = members.map((m) =>
-        m.Id === dataToSave.Id ? dataToSave : m
+    const converted =
+      mode === "edit" && dataToSave && Number(dataToSave.Position) !== 6;
+
+    if (converted) {
+      // Guest became a member: drop from the guest list right away
+      setMembers((prev) => prev.filter((m) => m.Id !== dataToSave.Id));
+      if (dataToSave.Contact) {
+        alert("Converted to member. The member card is being sent on WhatsApp.");
+      } else {
+        alert("Converted to member. No mobile number saved, so the card was not sent.");
+      }
+    } else if (mode === "edit") {
+      setMembers((prev) =>
+        prev.map((m) => (m.Id === dataToSave.Id ? dataToSave : m))
       );
-      setMembers(updated);
     } else if (mode === "add") {
       setMembers((prev) => [...prev, dataToSave]);
     }
     handleCancelForm();
+    // Reload from the server so the table shows current details
+    setRefreshKey((k) => k + 1);
   };
 
   const handleDelete = async (id) => {
@@ -173,7 +186,7 @@ const ManageGuests = () => {
       }
     }
     fetchMembers();
-  }, [debouncedSearchTerm, debouncedContactFilter, debouncedEmailFilter, filters.Gender]);
+  }, [debouncedSearchTerm, debouncedContactFilter, debouncedEmailFilter, filters.Gender, refreshKey]);
 
   return (
     <SidebarLayout>
